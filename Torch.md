@@ -1,5 +1,5 @@
 # Torch
-*19 cards · regenerated 2026-05-09 01:17 UTC from Anki via MCP · do not hand-edit*
+*19 cards · regenerated 2026-05-09 01:18 UTC from Anki via MCP · do not hand-edit*
 
 ## What are the three core components of the PyTorch library?
 *Basic · id 1760207386105*

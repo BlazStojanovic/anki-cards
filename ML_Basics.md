@@ -1,5 +1,5 @@
 # ML Basics
-*48 cards · regenerated 2026-05-09 01:17 UTC from Anki via MCP · do not hand-edit*
+*48 cards · regenerated 2026-05-09 01:18 UTC from Anki via MCP · do not hand-edit*
 
 ## How does a bag-of-words model work?
 *Basic · id 1758684368084*

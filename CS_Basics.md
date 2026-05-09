@@ -1,5 +1,5 @@
 # CS Basics
-*305 cards · regenerated 2026-05-09 01:17 UTC from Anki via MCP · do not hand-edit*
+*305 cards · regenerated 2026-05-09 01:18 UTC from Anki via MCP · do not hand-edit*
 
 ## What is RAM?
 *Basic · id 1755140815571*
