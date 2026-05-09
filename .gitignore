@@ -1,0 +1,6 @@
+.ankiops.db
+.ankiops.db-shm
+.ankiops.db-wal
+llm/.llm.db
+llm/.llm.db-shm
+llm/.llm.db-wal
