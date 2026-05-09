@@ -1,29 +1,35 @@
-<!-- note_key: 3a2a9bf23def -->
-BF: What are the three core components of the PyTorch library?
-BB: 1. The `Tensor` Library -> A library for array operations, optimized for efficiency across different device types
+# Torch
+*19 cards · regenerated 2026-05-09 01:17 UTC from Anki via MCP · do not hand-edit*
+
+## What are the three core components of the PyTorch library?
+*Basic · id 1760207386105*
+
+1. The `Tensor` Library -> A library for array operations, optimized for efficiency across different device types
 2. The automatic-differentiation engine -> Enables automatic computation of gradients for tensor operations
 3. The Deep learning library -> Building blocks, for ML. Including pre-trained models, loss functions, and optimizers
 
 ---
 
-<!-- note_key: 0c6eb4cd58c1 -->
-BF: What is the difference between `.reshape` and `.view` in `PyTorch`?
-BB: Both methods are used to reshape the `tensor` object. `.view` is more commonly used. 
+## What is the difference between `.reshape` and `.view` in `PyTorch`?
+*Basic · id 1760232071457*
+
+Both methods are used to reshape the `tensor` object. `.view` is more commonly used. 
 
 The difference is subtle, `.view` requires the original data to be contiguous in memory and will fail if it isn't, `.reshape()` will work regardless, copying the data if necessary.
 
-**Rule of thumb:
-**Use `.view()` when you need to ensure no-copy occurs (performance-critical code)
+<b>Rule of thumb:
+</b>Use `.view()` when you need to ensure no-copy occurs (performance-critical code)
 Use `.reshape()` when unsure.
 
 ---
 
-<!-- note_key: 6879c7a2a338 -->
-BF: Why do some `PyTorch` operations on tensors like `.transpose()` or `.permute()` result in non-contiguous tensors in memory?
-BB: Tensors are stored as 1D arrays in memory!
+## Why do some `PyTorch` operations on tensors like `.transpose()` or `.permute()` result in non-contiguous tensors in memory?
+*Basic · id 1760233035366*
 
-A contiguous array is just an array stored in an unbroken block of memory: to access the next value in the array, we just move to the next memory address.
+Tensors are stored as 1D arrays in memory!
 
+<span style="color: rgb(12, 13, 14);">A contiguous array is just an array stored in an unbroken block of memory: to access the next value in the array, we just move to the next memory address.
+</span>
 Transposing and permuting is performed internally by changing the "stride" property of the array/tensor, because this is an O(1) operation, instead of copying! 
 
 Contiguity breaks because you can no longer access next element at the next index in memory!
@@ -32,382 +38,239 @@ Contiguity breaks because you can no longer access next element at the next inde
 
 ---
 
-<!-- note_key: e2feb79e57a9 -->
-BF: How does `.view` work in `PyTorch`?
-BB: `.view()` creates a **new tensor object** that shares the same underlying memory as the original tensor, but interprets it with different dimensions.
+## How does `.view` work in `PyTorch`?
+*Basic · id 1760233175963*
 
-**Core components of the tensor:**
+<code>.view()</code> creates a <b>new tensor object</b> that shares the same underlying memory as the original tensor, but interprets it with different dimensions.
 
-1. **Data pointer**: Points to the actual memory buffer
-2. **Shape**: The dimensions, e.g., `(3, 4)`
-3. **Strides**: How many elements to skip in memory to move along each dimension
-4. **Storage offset**: Where in the memory buffer this tensor starts
+<b>Core components of the tensor:</b>
+<ol><li><b>Data pointer</b>: Points to the actual memory buffer</li><li><b>Shape</b>: The dimensions, e.g., <code>(3, 4)</code></li><li><b>Strides</b>: How many elements to skip in memory to move along each dimension</li><li><b>Storage offset</b>: Where in the memory buffer this tensor starts
 
-**What `.view` does?**
+</li></ol><b>What `.view` does?</b>
 
-```
-x = torch.randn(3, 4)  \# Shape (3,4)
-y = x.view(12)         \# Shape (12,)
-```
+<pre><code>x <span style="color: rgb(64, 120, 242);">=</span> torch<span style="color: rgb(56, 58, 66);">.</span>randn<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">3</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(183, 107, 1);">4</span><span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># Shape (3,4)</span>
+y <span style="color: rgb(64, 120, 242);">=</span> x<span style="color: rgb(56, 58, 66);">.</span>view<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">12</span><span style="color: rgb(56, 58, 66);">)</span>         <span style="color: rgb(160, 161, 167); font-style: italic;"># Shape (12,)</span></code></pre>
 
-**Steps**:
-
-1. **Check compatibility**: Verify the total number of elements is the same (3×4 = 12 ✓)
-2. **Check contiguity**: Verify the memory layout allows the new shape to be represented with valid strides
-3. **Create new tensor metadata**:
-   - Same data pointer (shares memory!)
-   - New shape: `(12,)`
-   - New strides: `(1,)`
-   - Same storage offset
-
-It is a **metadata only** operation! If incompatible strides are required for the operation then it throws an error
+<b>Steps</b>:
+<ol><li><b>Check compatibility</b>: Verify the total number of elements is the same (3×4 = 12 ✓)</li><li><b>Check contiguity</b>: Verify the memory layout allows the new shape to be represented with valid strides</li><li><b>Create new tensor metadata</b>:<ul><li>Same data pointer (shares memory!)</li><li>New shape: <code>(12,)</code></li><li>New strides: <code>(1,)</code></li><li>Same storage offset</li></ul></li></ol>
+It is a <b>metadata only </b>operation! If incompatible strides are required for the operation then it throws an error
 
 ---
 
-<!-- note_key: 2ec802126aea -->
-BF: How does automatic differentiation work in popular ML libraries?
-BB: **Core Mechanism:** Automatic differentiation (autodiff) computes derivatives by applying the chain rule systematically to elementary operations. Modern ML libraries use **reverse-mode autodiff** (backpropagation).
+## How does automatic differentiation work in popular ML libraries?
+*Basic · id 1760236232901*
 
-**Key Components:**
-
-1. **Computational Graph**: Operations are represented as nodes, with data flowing along edges. Each operation stores:
-   - Input values
-   - Output values
-   - Local gradient functions
-2. **Forward Pass**:
-   - Executes operations and computes outputs
-   - Records operations in a dynamic computation graph (tape)
-   - Example: PyTorch builds graph on-the-fly; TensorFlow can use static or dynamic graphs
-3. **Backward Pass**:
-   - Starts from loss (scalar output)
-   - Applies chain rule in reverse topological order
-   - Each node computes: `∂Loss/∂input = ∂Loss/∂output × ∂output/∂input`
-   - Accumulates gradients for parameters
-
-**Implementation Details:**
-
-- **PyTorch**: Uses `autograd` with dynamic computation graphs. Tensors track operations when `requires_grad=True`
-- **TensorFlow**: Uses `GradientTape` to record operations for differentiation
-- **JAX**: Uses function transformations (`grad`, `jit`) for pure functional autodiff
-
-**Advantages over alternatives:**
-
-- More accurate than numerical differentiation
-- More efficient than symbolic differentiation for high-dimensional problems
-- Handles complex control flow in dynamic graphs
+<strong>Core Mechanism:</strong> Automatic differentiation (autodiff) computes derivatives by applying the chain rule systematically to elementary operations. Modern ML libraries use <strong>reverse-mode autodiff</strong> (backpropagation).
+<strong>Key Components:</strong>
+<ol><li><strong>Computational Graph</strong>: Operations are represented as nodes, with data flowing along edges. Each operation stores:<ul><li>Input values</li><li>Output values</li><li>Local gradient functions</li></ul></li><li><strong>Forward Pass</strong>:<ul><li>Executes operations and computes outputs</li><li>Records operations in a dynamic computation graph (tape)</li><li>Example: PyTorch builds graph on-the-fly; TensorFlow can use static or dynamic graphs</li></ul></li><li><strong>Backward Pass</strong>:<ul><li>Starts from loss (scalar output)</li><li>Applies chain rule in reverse topological order</li><li>Each node computes: <code>∂Loss/∂input = ∂Loss/∂output × ∂output/∂input</code></li><li>Accumulates gradients for parameters</li></ul></li></ol><strong>Implementation Details:</strong>
+<ul><li><strong>PyTorch</strong>: Uses <code>autograd</code> with dynamic computation graphs. Tensors track operations when <code>requires_grad=True</code></li><li><strong>TensorFlow</strong>: Uses <code>GradientTape</code> to record operations for differentiation</li><li><strong>JAX</strong>: Uses function transformations (<code>grad</code>, <code>jit</code>) for pure functional autodiff</li></ul><strong>Advantages over alternatives:</strong>
+<ul><li>More accurate than numerical differentiation</li><li>More efficient than symbolic differentiation for high-dimensional problems</li><li>Handles complex control flow in dynamic graphs</li></ul>
 
 ---
 
-<!-- note_key: 2e34bfc27b8f -->
-BF: How to get the number of elements of a tensor?
-BB: `tensor.numel()`
+## How to get the number of elements of a tensor?
+*Basic · id 1760237453958*
+
+`tensor.numel()`
 
 ---
 
-<!-- note_key: e644f878ded0 -->
-BF: Why would you want to use torch.no_grad()?
-BB: # **Purpose:** Disables gradient computation and tracking of operations in the computational graph.
+## Why would you want to use torch.no_grad()?
+*Basic · id 1760238381178*
 
-**Key Use Cases:**
+<h1><strong style="font-size: 20px;">Purpose:</strong><span style="font-size: 20px;"> </span><span style="font-size: 20px;">Disables gradient computation and tracking of operations in the computational graph.</span>
+</h1><strong>Key Use Cases:</strong>
+<ol><li><strong>Inference/Evaluation</strong>:<ul><li>No need to compute gradients during model evaluation</li><li>Significantly reduces memory consumption</li><li>Speeds up forward pass</li></ul></li></ol><pre><code>   with torch.no_grad():
+   outputs = model(test_data)</code></pre>
 
-1. **Inference/Evaluation**:
-   - No need to compute gradients during model evaluation
-   - Significantly reduces memory consumption
-   - Speeds up forward pass
+<ol><li><strong>Manual Parameter Updates</strong>:<ul><li>When updating weights manually (not through optimizer)</li><li>Prevents these operations from being tracked</li></ul></li></ol><pre><code>   with torch.no_grad():
+   param -= learning_rate * param.grad</code></pre>
 
-```
-with torch.no_grad():
-outputs = model(test_data)
-```
-
-1. **Manual Parameter Updates**:
-   - When updating weights manually (not through optimizer)
-   - Prevents these operations from being tracked
-
-```
-with torch.no_grad():
-param -= learning_rate * param.grad
-```
-
-1. **Data Preprocessing/Augmentation**:
-   - Operations on input data that shouldn't be part of computational graph
-   - Saves memory by not storing intermediate activations
-
-**Benefits:**
-
-- **Memory Efficiency**: Doesn't store intermediate activations needed for backprop (major savings for large models)
-- **Speed**: Faster execution without gradient bookkeeping overhead
-- **Prevents Errors**: Avoids accidentally computing gradients where they're not needed
-
-**Alternative:**
-
-- `@torch.inference_mode()`: Similar but more aggressive optimization, cannot be used if you might enable gradients later
-- `.detach()`: For specific tensors rather than context blocks
-
-**Common Pattern:**
-
-```
-model.eval()  \# Sets batch norm, dropout to eval mode
-with torch.no_grad():  \# Disables gradient computation
-    predictions = model(data)
-```
+<ol><li><strong>Data Preprocessing/Augmentation</strong>:<ul><li>Operations on input data that shouldn't be part of computational graph</li><li>Saves memory by not storing intermediate activations</li></ul></li></ol><strong>Benefits:</strong>
+<ul><li><strong>Memory Efficiency</strong>: Doesn't store intermediate activations needed for backprop (major savings for large models)</li><li><strong>Speed</strong>: Faster execution without gradient bookkeeping overhead</li><li><strong>Prevents Errors</strong>: Avoids accidentally computing gradients where they're not needed</li></ul><strong>Alternative:</strong>
+<ul><li><code>@torch.inference_mode()</code>: Similar but more aggressive optimization, cannot be used if you might enable gradients later</li><li><code>.detach()</code>: For specific tensors rather than context blocks</li></ul><strong>Common Pattern:</strong>
+<pre><code>model.eval()  <span style="font-style: italic;"># Sets batch norm, dropout to eval mode</span>
+with torch.no_grad():  <span style="font-style: italic;"># Disables gradient computation</span>
+    predictions = model(data)</code></pre>
 
 ---
 
-<!-- note_key: 8c14381536e1 -->
-BF: What are logits, and why do usually models in `PyTorch` skip the last non-linearity?
-BB: **What are Logits?** Logits are the raw, unnormalized output scores from a model before applying the final activation function (e.g., softmax or sigmoid). They represent the model's "confidence" for each class in log-odds space.
+## What are logits, and why do usually models in <code>PyTorch</code> skip the last non-linearity?
+*Basic · id 1760238564202*
 
-**Why Skip the Final Non-linearity?**
+<strong>What are Logits?</strong> Logits are the raw, unnormalized output scores from a model before applying the final activation function (e.g., softmax or sigmoid). They represent the model's "confidence" for each class in log-odds space.
 
-1. **Numerical Stability**:
-   - Combined operations (softmax \+ log) are more numerically stable when fused
-   - Example: `CrossEntropyLoss` internally applies log-softmax
-   - Avoids issues like log(0) or overflow in exp()
+<strong>Why Skip the Final Non-linearity?</strong>
+<ol><li><strong>Numerical Stability</strong>:<ul><li>Combined operations (softmax + log) are more numerically stable when fused</li><li>Example: <code>CrossEntropyLoss</code> internally applies log-softmax</li><li>Avoids issues like log(0) or overflow in exp()</li></ul></li></ol><pre><code>   <span style="font-style: italic;"># Unstable</span>
+   probs = softmax(logits)
+   loss = -log(probs[target])
+   
+   <span style="font-style: italic;"># Stable (what PyTorch does internally)</span>
+   loss = log_softmax(logits)[target]</code></pre>
 
-```
-\# Unstable
-probs = softmax(logits)
-loss = -log(probs[target])
-  
-\# Stable (what PyTorch does internally)
-loss = log_softmax(logits)[target]
-```
-
-1. **Computational Efficiency**:
-   - Fused operations are faster and more memory-efficient
-   - `log(softmax(x))` simplifies mathematically: `x - log(sum(exp(x)))`
-   - Avoids computing intermediate softmax probabilities
-2. **Gradient Flow**:
-   - Combined implementation has better gradient properties
-   - Prevents vanishing gradients from separate softmax \+ log operations
-
-**Common PyTorch Pattern:**
+<ol><li><strong>Computational Efficiency</strong>:<ul><li>Fused operations are faster and more memory-efficient</li><li><code>log(softmax(x))</code> simplifies mathematically: <code>x - log(sum(exp(x)))</code></li><li>Avoids computing intermediate softmax probabilities</li></ul></li><li><strong>Gradient Flow</strong>:<ul><li>Combined implementation has better gradient properties</li><li>Prevents vanishing gradients from separate softmax + log operations</li></ul></li></ol><strong>Common PyTorch Pattern:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># Model outputs logits</span>
+logits = model(x)  <span style="font-style: italic;"># Shape: [batch, num_classes]</span>
 
-```
-\# Model outputs logits
-logits = model(x)  \# Shape: [batch, num_classes]
-
-\# Loss function handles softmax internally
+<span style="font-style: italic;"># Loss function handles softmax internally</span>
 loss = nn.CrossEntropyLoss()(logits, targets)
 
-\# For predictions, apply softmax manually
-probs = torch.softmax(logits, dim=1)
-```
+<span style="font-style: italic;"># For predictions, apply softmax manually</span>
+probs = torch.softmax(logits, dim=1)</code></pre>
 
-**Key Takeaway:** Models output logits; loss functions apply the activation. This separation improves stability, efficiency, and training dynamics.
+<strong>Key Takeaway:</strong> Models output logits; loss functions apply the activation. This separation improves stability, efficiency, and training dynamics.
 
 ---
 
-<!-- note_key: 9a7a30f44d9b -->
-BF: What are the `Dataset` and `DataLoader` classes for?
-BB: # **Purpose:** PyTorch classes that provide a standardized interface for loading and iterating over data during training/evaluation.
+## What are the <code>Dataset</code> and <code>DataLoader</code> classes for?
+*Basic · id 1760238724096*
 
-**Dataset Class:** Represents the data itself and defines how to access individual samples.
-
-**Key Methods:**
-
-- `__len__()`: Returns total number of samples
-- `__getitem__(idx)`: Returns a single sample (features, label) at index `idx`
+<h1><strong style="font-size: 20px;">Purpose:</strong><span style="font-size: 20px;"> </span><span style="font-size: 20px;">PyTorch classes that provide a standardized interface for loading and iterating over data during training/evaluation.</span></h1><strong>Dataset Class:</strong> Represents the data itself and defines how to access individual samples.
+<strong>Key Methods:</strong>
+<ul><li><code>__len__()</code>: Returns total number of samples</li><li><code>__getitem__(idx)</code>: Returns a single sample (features, label) at index <code>idx</code></li></ul>
 
 python
-
-```
-class CustomDataset(Dataset):
+<pre><code>class CustomDataset(Dataset):
     def __init__(self, data, labels):
         self.data = data
         self.labels = labels
-  
+    
     def __len__(self):
         return len(self.data)
-  
+    
     def __getitem__(self, idx):
-        return self.data[idx], self.labels[idx]
-```
+        return self.data[idx], self.labels[idx]</code></pre>
 
-**DataLoader Class:** Wraps a Dataset and provides batching, shuffling, parallel loading, and more.
-
-**Key Features:**
-
-- **Batching**: Groups samples into batches automatically
-- **Shuffling**: Randomizes data order each epoch
-- **Parallel Loading**: Uses multiple workers to load data asynchronously
-- **Automatic Collation**: Combines samples into batches (with `collate_fn`)
+<strong>DataLoader Class:</strong> Wraps a Dataset and provides batching, shuffling, parallel loading, and more.
+<strong>Key Features:</strong>
+<ul><li><strong>Batching</strong>: Groups samples into batches automatically</li><li><strong>Shuffling</strong>: Randomizes data order each epoch</li><li><strong>Parallel Loading</strong>: Uses multiple workers to load data asynchronously</li><li><strong>Automatic Collation</strong>: Combines samples into batches (with <code>collate_fn</code>)</li></ul>
 
 python
-
-```
-dataloader = DataLoader(
+<pre><code>dataloader = DataLoader(
     dataset,
     batch_size=32,
     shuffle=True,
     num_workers=4,
-    pin_memory=True  \# Faster GPU transfer
+    pin_memory=True  <span style="font-style: italic;"># Faster GPU transfer</span>
 )
 
 for batch_features, batch_labels in dataloader:
-    \# batch_features: [32, ...], batch_labels: [32]
-    outputs = model(batch_features)
-```
+    <span style="font-style: italic;"># batch_features: [32, ...], batch_labels: [32]</span>
+    outputs = model(batch_features)</code></pre>
 
-**Benefits:**
-
-- **Separation of Concerns**: Dataset handles data access; DataLoader handles iteration
-- **Memory Efficiency**: Loads data on-demand, not all at once
-- **Performance**: Multi-process loading prevents I/O bottlenecks
-- **Flexibility**: Easy to swap datasets or change loading parameters
-
-**Common Use:** Dataset = "what the data is", DataLoader = "how to iterate over it"
+<strong>Benefits:</strong>
+<ul><li><strong>Separation of Concerns</strong>: Dataset handles data access; DataLoader handles iteration</li><li><strong>Memory Efficiency</strong>: Loads data on-demand, not all at once</li><li><strong>Performance</strong>: Multi-process loading prevents I/O bottlenecks</li><li><strong>Flexibility</strong>: Easy to swap datasets or change loading parameters</li></ul><strong>Common Use:</strong> Dataset = "what the data is", DataLoader = "how to iterate over it"
 
 ---
 
-<!-- note_key: dfa0437d211c -->
-BF: Why are `model.train()` and `model.eval()` necessary?
-BB: **Purpose:** These methods switch the model between training and evaluation modes, changing the behavior of certain layers.
+## Why are <code>model.train()</code> and <code>model.eval()</code> necessary?
+*Basic · id 1760239665437*
 
-**Layers Affected:**
+<strong>Purpose:</strong> These methods switch the model between training and evaluation modes, changing the behavior of certain layers.
 
-1. **Dropout**:
-   - `train()`: Randomly drops neurons (e.g., with p=0.5)
-   - `eval()`: Disables dropout, uses all neurons
-   - Why: Dropout is a regularization technique only needed during training
-2. **Batch Normalization**:
-   - `train()`: Uses batch statistics (mean/std of current batch) and updates running statistics
-   - `eval()`: Uses running statistics accumulated during training (fixed)
-   - Why: Test batches may be small or single samples; batch stats would be unreliable
-3. **Other Layers**: Layer Normalization variants, DropPath, Stochastic Depth, etc.
-
-**Example Usage:**
+<strong>Layers Affected:</strong>
+<ol><li><strong>Dropout</strong>:<ul><li><code>train()</code>: Randomly drops neurons (e.g., with p=0.5)</li><li><code>eval()</code>: Disables dropout, uses all neurons</li><li>Why: Dropout is a regularization technique only needed during training</li></ul></li><li><strong>Batch Normalization</strong>:<ul><li><code>train()</code>: Uses batch statistics (mean/std of current batch) and updates running statistics</li><li><code>eval()</code>: Uses running statistics accumulated during training (fixed)</li><li>Why: Test batches may be small or single samples; batch stats would be unreliable</li></ul></li><li><strong>Other Layers</strong>: Layer Normalization variants, DropPath, Stochastic Depth, etc.</li></ol><strong>Example Usage:</strong>
 
 python
-
-```
-\# Training
+<pre><code><span style="font-style: italic;"># Training</span>
 model.train()
 for data, labels in train_loader:
     optimizer.zero_grad()
-    outputs = model(data)  \# Dropout active, BN uses batch stats
+    outputs = model(data)  <span style="font-style: italic;"># Dropout active, BN uses batch stats</span>
     loss = criterion(outputs, labels)
     loss.backward()
     optimizer.step()
 
-\# Evaluation
+<span style="font-style: italic;"># Evaluation</span>
 model.eval()
 with torch.no_grad():
     for data, labels in test_loader:
-        outputs = model(data)  \# Dropout off, BN uses running stats
-        \# compute metrics
-```
+        outputs = model(data)  <span style="font-style: italic;"># Dropout off, BN uses running stats</span>
+        <span style="font-style: italic;"># compute metrics</span></code></pre>
 
-**Important:**
-
-- `model.eval()` does NOT disable gradient computation (use `torch.no_grad()` for that)
-- Forgetting `model.eval()` during inference causes incorrect predictions due to dropout/BN behavior
-- Always pair: `model.eval() + torch.no_grad()` for inference
-
-**Key Takeaway:** Controls layer behavior to ensure proper training (with regularization) and deterministic, accurate inference (without randomness).
+<strong>Important:</strong>
+<ul><li><code>model.eval()</code> does NOT disable gradient computation (use <code>torch.no_grad()</code> for that)</li><li>Forgetting <code>model.eval()</code> during inference causes incorrect predictions due to dropout/BN behavior</li><li>Always pair: <code>model.eval() + torch.no_grad()</code> for inference</li></ul><strong>Key Takeaway:</strong> Controls layer behavior to ensure proper training (with regularization) and deterministic, accurate inference (without randomness).
 
 ---
 
-<!-- note_key: cf4b0a21045b -->
-BF: Why is `optimizer.zero_grad()` necessary?
-BB: **Purpose:** Clears (zeros out) the gradients of all parameters tracked by the optimizer before computing new gradients.
+## Why is <code>optimizer.zero_grad()</code> necessary?
+*Basic · id 1760239760483*
 
-**Why It's Necessary:**
+<strong>Purpose:</strong> Clears (zeros out) the gradients of all parameters tracked by the optimizer before computing new gradients.
 
-**PyTorch accumulates gradients by default** - calling `.backward()` *adds* gradients to existing `.grad` attributes rather than replacing them.
-
-python
-
-```
-\# Without zero_grad()
-loss1.backward()  \# param.grad = grad1
-loss2.backward()  \# param.grad = grad1 \+ grad2 ❌
-
-\# With zero_grad()
-loss1.backward()       \# param.grad = grad1
-optimizer.zero_grad()  \# param.grad = 0
-loss2.backward()       \# param.grad = grad2 ✓
-```
-
-**Standard Training Loop:**
+<strong>Why It's Necessary:</strong>
+<strong>PyTorch accumulates gradients by default</strong> - calling <code>.backward()</code> <em>adds</em> gradients to existing <code>.grad</code> attributes rather than replacing them.
 
 python
+<pre><code><span style="font-style: italic;"># Without zero_grad()</span>
+loss1.backward()  <span style="font-style: italic;"># param.grad = grad1</span>
+loss2.backward()  <span style="font-style: italic;"># param.grad = grad1 + grad2 ❌</span>
 
-```
-for data, labels in dataloader:
-    optimizer.zero_grad()        \# 1. Clear old gradients
-  
-    outputs = model(data)        \# 2. Forward pass
+<span style="font-style: italic;"># With zero_grad()</span>
+loss1.backward()       <span style="font-style: italic;"># param.grad = grad1</span>
+optimizer.zero_grad()  <span style="font-style: italic;"># param.grad = 0</span>
+loss2.backward()       <span style="font-style: italic;"># param.grad = grad2 ✓</span></code></pre>
+
+<strong>Standard Training Loop:</strong>
+
+python
+<pre><code>for data, labels in dataloader:
+    optimizer.zero_grad()        <span style="font-style: italic;"># 1. Clear old gradients</span>
+    
+    outputs = model(data)        <span style="font-style: italic;"># 2. Forward pass</span>
     loss = criterion(outputs, labels)
-  
-    loss.backward()              \# 3. Compute gradients
-    optimizer.step()             \# 4. Update parameters
-```
+    
+    loss.backward()              <span style="font-style: italic;"># 3. Compute gradients</span>
+    optimizer.step()             <span style="font-style: italic;"># 4. Update parameters</span></code></pre>
 
-**When Gradient Accumulation IS Desired:**
+<strong>When Gradient Accumulation IS Desired:</strong>
 
 python
-
-```
-\# Accumulate gradients over multiple batches (for large effective batch size)
+<pre><code><span style="font-style: italic;"># Accumulate gradients over multiple batches (for large effective batch size)</span>
 for i, (data, labels) in enumerate(dataloader):
     outputs = model(data)
     loss = criterion(outputs, labels) / accumulation_steps
-    loss.backward()  \# Accumulate gradients
-  
+    loss.backward()  <span style="font-style: italic;"># Accumulate gradients</span>
+    
     if (i + 1) % accumulation_steps == 0:
         optimizer.step()
-        optimizer.zero_grad()  \# Clear after update
-```
+        optimizer.zero_grad()  <span style="font-style: italic;"># Clear after update</span></code></pre>
 
-**Common Mistake:** Forgetting `zero_grad()` leads to:
-
-- Gradients from multiple batches mixing incorrectly
-- Exploding gradients
-- Model failing to converge
-
-**Key Takeaway:** Call `optimizer.zero_grad()` before each backward pass to ensure clean gradient computation, unless intentionally accumulating gradients.
+<strong>Common Mistake:</strong> Forgetting <code>zero_grad()</code> leads to:
+<ul><li>Gradients from multiple batches mixing incorrectly</li><li>Exploding gradients</li><li>Model failing to converge</li></ul><strong>Key Takeaway:</strong> Call <code>optimizer.zero_grad()</code> before each backward pass to ensure clean gradient computation, unless intentionally accumulating gradients.
 
 ---
 
-<!-- note_key: 534aa1e2b783 -->
-BF: How do you store and load `PyTorch` models?
-BB: **1. Save/Load State Dictionary (RECOMMENDED)** Saves only the model parameters (weights and biases), not the model architecture.
+## How do you store and load `PyTorch` models?
+*Basic · id 1760247683102*
+
+<strong>1. Save/Load State Dictionary (RECOMMENDED)</strong> Saves only the model parameters (weights and biases), not the model architecture.
 
 python
-
-```
-\# Saving
+<pre><code><span style="font-style: italic;"># Saving</span>
 torch.save(model.state_dict(), 'model_weights.pth')
 
-\# Loading
-model = MyModel()  \# Must instantiate architecture first
+<span style="font-style: italic;"># Loading</span>
+model = MyModel()  <span style="font-style: italic;"># Must instantiate architecture first</span>
 model.load_state_dict(torch.load('model_weights.pth'))
-model.eval()  \# Set to evaluation mode
-```
+model.eval()  <span style="font-style: italic;"># Set to evaluation mode</span></code></pre>
 
-**2. Save/Load Entire Model** Saves both architecture and parameters (less flexible, not recommended).
+<strong>2. Save/Load Entire Model</strong> Saves both architecture and parameters (less flexible, not recommended).
 
 python
-
-```
-\# Saving
+<pre><code><span style="font-style: italic;"># Saving</span>
 torch.save(model, 'entire_model.pth')
 
-\# Loading
+<span style="font-style: italic;"># Loading</span>
 model = torch.load('entire_model.pth')
-model.eval()
-```
+model.eval()</code></pre>
 
-**Best Practice - Save Checkpoint with Extra Info:**
+<strong>Best Practice - Save Checkpoint with Extra Info:</strong>
 
 python
-
-```
-\# Saving
+<pre><code><span style="font-style: italic;"># Saving</span>
 torch.save({
     'epoch': epoch,
     'model_state_dict': model.state_dict(),
@@ -416,491 +279,369 @@ torch.save({
     'hyperparameters': config
 }, 'checkpoint.pth')
 
-\# Loading
+<span style="font-style: italic;"># Loading</span>
 checkpoint = torch.load('checkpoint.pth')
 model.load_state_dict(checkpoint['model_state_dict'])
 optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 epoch = checkpoint['epoch']
-loss = checkpoint['loss']
-```
+loss = checkpoint['loss']</code></pre>
 
-**Important Considerations:**
-
-- **Device Mapping**: When loading on different device:
+<strong>Important Considerations:</strong>
+<ul><li><strong>Device Mapping</strong>: When loading on different device:</li></ul>
 
 python
-
-```
-\# Load model trained on GPU to CPU
-model.load_state_dict(torch.load('model.pth', map_location='cpu'))
+<pre><code>  <span style="font-style: italic;"># Load model trained on GPU to CPU</span>
+  model.load_state_dict(torch.load('model.pth', map_location='cpu'))
   
-\# Load to specific GPU
-model.load_state_dict(torch.load('model.pth', map_location='cuda:0'))
-```
+  <span style="font-style: italic;"># Load to specific GPU</span>
+  model.load_state_dict(torch.load('model.pth', map_location='cuda:0'))</code></pre>
 
-- **File Extension**: `.pth` or `.pt` are conventional
-- **Why state_dict is preferred**:
-   - More portable and flexible
-   - Survives code refactoring
-   - Smaller file size
-   - Compatible across PyTorch versions
-
-**Key Takeaway:** Use `state_dict()` for production; save optimizer state for resuming training; use `map_location` for device compatibility.
+<ul><li><strong>File Extension</strong>: <code>.pth</code> or <code>.pt</code> are conventional</li><li><strong>Why state_dict is preferred</strong>:<ul><li>More portable and flexible</li><li>Survives code refactoring</li><li>Smaller file size</li><li>Compatible across PyTorch versions</li></ul></li></ul><strong>Key Takeaway:</strong> Use <code>state_dict()</code> for production; save optimizer state for resuming training; use <code>map_location</code> for device compatibility.
 
 ---
 
-<!-- note_key: 8414a0e4f776 -->
-BF: How does using `PyTorch` work on a GPU? How can you train on multiple GPUs?
-BB: **Single GPU Usage:**
+## How does using `PyTorch` work on a GPU? How can you train on multiple GPUs?
+*Basic · id 1760247932518*
 
-Move model and data to GPU using `.to()` or `.cuda()`:
+<strong>Single GPU Usage:</strong>
+Move model and data to GPU using <code>.to()</code> or <code>.cuda()</code>:
 
 python
+<pre><code>device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-```
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-\# Move model to GPU
+<span style="font-style: italic;"># Move model to GPU</span>
 model = MyModel().to(device)
 
-\# Move data to GPU in training loop
+<span style="font-style: italic;"># Move data to GPU in training loop</span>
 for data, labels in dataloader:
     data = data.to(device)
     labels = labels.to(device)
-  
-    outputs = model(data)  \# Computation happens on GPU
+    
+    outputs = model(data)  <span style="font-style: italic;"># Computation happens on GPU</span>
     loss = criterion(outputs, labels)
 
-Multi-GPU Training Approaches:
-
-1. DataParallel (Simple but Limited)
-
-- Splits batch across GPUs, replicates model on each
-- Single-process, limited scalability
+<strong>Multi-GPU Training Approaches:</strong>
+<strong>1. DataParallel (Simple but Limited)</strong>
+<ul><li>Splits batch across GPUs, replicates model on each</li><li>Single-process, limited scalability</li></ul>
 
 python
-```
-model = nn.DataParallel(model)
+<pre><code>model = nn.DataParallel(model)
 model.to(device)
-\# Use normally - PyTorch handles the rest
-```
+<span style="font-style: italic;"># Use normally - PyTorch handles the rest</span></code></pre>
 
-2. DistributedDataParallel (RECOMMENDED)
-
-- Multi-process, one GPU per process
-- Better performance and scaling
-- More efficient gradient synchronization
+<strong>2. DistributedDataParallel (RECOMMENDED)</strong>
+<ul><li>Multi-process, one GPU per process</li><li>Better performance and scaling</li><li>More efficient gradient synchronization</li></ul>
 
 python
-```
-\# Basic setup
+<pre><code><span style="font-style: italic;"># Basic setup</span>
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-\# Initialize process group
+<span style="font-style: italic;"># Initialize process group</span>
 dist.init_process_group(backend='nccl')
 local_rank = int(os.environ['LOCAL_RANK'])
 
-\# Move model to specific GPU
+<span style="font-style: italic;"># Move model to specific GPU</span>
 model = MyModel().to(local_rank)
 model = DDP(model, device_ids=[local_rank])
 
-\# Use DistributedSampler for data
+<span style="font-style: italic;"># Use DistributedSampler for data</span>
 sampler = DistributedSampler(dataset)
-dataloader = DataLoader(dataset, sampler=sampler)
-```
+dataloader = DataLoader(dataset, sampler=sampler)</code></pre>
 
-Launch DDP with:
+<strong>Launch DDP with:</strong>
 
 bash
-```
-torchrun --nproc_per_node=4 train.py
-\# or
-python -m torch.distributed.launch --nproc_per_node=4 train.py
-```
+<pre><code>torchrun --nproc_per_node=4 train.py
+<span style="font-style: italic;"># or</span>
+python -m torch.distributed.launch --nproc_per_node=4 train.py</code></pre>
 
-3. Other Strategies:
+<strong>3. Other Strategies:</strong>
+<ul><li><strong>Model Parallelism</strong>: Split model across GPUs (for models too large for one GPU)</li><li><strong>Pipeline Parallelism</strong>: Different layers on different GPUs</li><li><strong>FSDP</strong> (Fully Sharded Data Parallel): For very large models, shards parameters across GPUs</li></ul><strong>Key Differences:</strong>
+<pre><table><tbody><tr><th>Feature</th><th>DataParallel</th><th>DistributedDataParallel</th></tr><tr><td>Processes</td><td>Single</td><td>Multiple</td></tr><tr><td>Performance</td><td>Good</td><td>Better</td></tr><tr><td>Scalability</td><td>Limited</td><td>Excellent</td></tr><tr><td>Multi-node</td><td>No</td><td>Yes</td></tr></tbody></table></pre><strong>Memory Considerations:</strong>
+<ul><li>GPU memory freed with <code>del tensor</code> or <code>torch.cuda.empty_cache()</code></li><li>Monitor with <code>torch.cuda.memory_allocated()</code></li></ul><strong>Key Takeaway:</strong> Single GPU: use <code>.to(device)</code>. Multiple GPUs: prefer DDP over DataParallel for better performance and scalability.
 
-- Model Parallelism: Split model across GPUs (for models too large for one GPU)
-- Pipeline Parallelism: Different layers on different GPUs
-- FSDP (Fully Sharded Data Parallel): For very large models, shards parameters across GPUs
-
-Key Differences:
-```
-| Feature | DataParallel | DistributedDataParallel |
-| --- | --- | --- |
-| Processes | Single | Multiple |
-| Performance | Good | Better |
-| Scalability | Limited | Excellent |
-| Multi-node | No | Yes |
-
-```
-
-Memory Considerations:
-
-- GPU memory freed with del tensor or torch.cuda.empty_cache()
-- Monitor with torch.cuda.memory_allocated()
-
-Key Takeaway: Single GPU: use .to(device). Multiple GPUs: prefer DDP over DataParallel for better performance and scalability.
-```
+</code></pre>
 
 ---
 
-<!-- note_key: ec4aabc13751 -->
-BF: What is the best practice line for making `PyTorch` code resilient on device it runs on?
-BB: device = torch.device("cude" if torch.cuda.is_available() else "cpu")
+## What is the best practice line for making `PyTorch` code resilient on device it runs on?
+*Basic · id 1760248006207*
 
-\# .to(device)
+device = torch.device("cude" if torch.cuda.is_available() else "cpu")
+
+# .to(device)
 
 ---
 
-<!-- note_key: 760378cf5dc8 -->
-BF: What is the intuition behind a `torch.nn.Embedding` layer? How does it relate to a one-hot encoding?
-BB: An embedding layer maps discrete tokens (words, categories, IDs) to dense, continuous vector representations. It's a **learnable lookup table** where each token has an associated vector.
+## What is the intuition behind a <code>torch.nn.Embedding</code> layer? How does it relate to a one-hot encoding?
+*Basic · id 1760310269942*
+
+An embedding layer maps discrete tokens (words, categories, IDs) to dense, continuous vector representations. It's a <strong>learnable lookup table</strong> where each token has an associated vector.
 
 Embedding is mathematically equivalent to:
+<ol><li>One-hot encoding the input</li><li>Multiplying by a weight matrix</li></ol><pre><code><span style="color: rgb(160, 161, 167); font-style: italic;"># Manual process (inefficient)</span>
+vocab_size <span style="color: rgb(64, 120, 242);">=</span> <span style="color: rgb(183, 107, 1);">10000</span>
+one_hot <span style="color: rgb(64, 120, 242);">=</span> F<span style="color: rgb(56, 58, 66);">.</span>one_hot<span style="color: rgb(56, 58, 66);">(</span>token_id<span style="color: rgb(56, 58, 66);">,</span> num_classes<span style="color: rgb(64, 120, 242);">=</span>vocab_size<span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># [vocab_size]</span>
+weight_matrix <span style="color: rgb(64, 120, 242);">=</span> embedding<span style="color: rgb(56, 58, 66);">.</span>weight  <span style="color: rgb(160, 161, 167); font-style: italic;"># [vocab_size, embedding_dim]</span>
+result <span style="color: rgb(64, 120, 242);">=</span> one_hot @ weight_matrix  <span style="color: rgb(160, 161, 167); font-style: italic;"># [embedding_dim]</span>
 
-1. One-hot encoding the input
-2. Multiplying by a weight matrix
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Embedding layer (efficient)</span>
+result <span style="color: rgb(64, 120, 242);">=</span> embedding<span style="color: rgb(56, 58, 66);">(</span>token_id<span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># Direct lookup, same result!
 
-```
-\# Manual process (inefficient)
-vocab_size = 10000
-one_hot = F.one_hot(token_id, num_classes=vocab_size)  \# [vocab_size]
-weight_matrix = embedding.weight  \# [vocab_size, embedding_dim]
-result = one_hot @ weight_matrix  \# [embedding_dim]
-
-\# Embedding layer (efficient)
-result = embedding(token_id)  \# Direct lookup, same result!
-
-1. Efficiency:
-   - One-hot: stores sparse vector of size vocab_size (e.g., 10,000 dimensions)
-   - Embedding: direct lookup, returns dense vector (e.g., 300 dimensions)
-   - No matrix multiplication needed
-2. Learnable Representations:
-   - Embedding vectors are learned during training
-   - Similar tokens learn similar vectors (semantic meaning captured)
-   - One-hot has no notion of similarity (all tokens equally distant)
-3. Memory:
-   - Stores only vocab_size × embedding_dim parameters
-   - vs one-hot \+ linear layer: same parameters but slower computation
-Key Takeaway: Embeddings are efficient, learnable lookup tables that convert discrete tokens to dense vectors. They're equivalent to one-hot encoding + linear layer but much faster via direct indexing.
-```
+</span><strong></strong>
+<ol><li><strong>Efficiency</strong>:<ul><li>One-hot: stores sparse vector of size <code>vocab_size</code> (e.g., 10,000 dimensions)</li><li>Embedding: direct lookup, returns dense vector (e.g., 300 dimensions)</li><li>No matrix multiplication needed</li></ul></li><li><strong>Learnable Representations</strong>:<ul><li>Embedding vectors are learned during training</li><li>Similar tokens learn similar vectors (semantic meaning captured)</li><li>One-hot has no notion of similarity (all tokens equally distant)</li></ul></li><li><strong>Memory</strong>:<ul><li>Stores only <code>vocab_size × embedding_dim</code> parameters</li><li>vs one-hot + linear layer: same parameters but slower computation</li></ul></li></ol><strong>Key Takeaway:</strong> Embeddings are efficient, learnable lookup tables that convert discrete tokens to dense vectors. They're equivalent to one-hot encoding + linear layer but much faster via direct indexing.<span style="color: rgb(160, 161, 167); font-style: italic;">
+</span></code></pre>
 
 ---
 
-<!-- note_key: 7f68f1cb7414 -->
-BF: Explain `register_buffer()` in `PyTorch`!
-BB: **Definition:** `register_buffer()` registers a tensor as part of the model's state that should be saved/loaded but **not** trained (no gradients computed).
+## Explain <code>register_buffer()</code> in <code>PyTorch</code>!
+*Basic · id 1760406945734*
 
-**Basic Usage:**
-
-python
-
-```
-class MyModel(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc = nn.Linear(10, 5)  \# Trainable parameter
-  
-        \# Register buffer - not trainable
-        self.register_buffer('running_mean', torch.zeros(5))
-  
-    def forward(self, x):
-        \# Use buffer like any tensor
-        x = self.fc(x)
-        return x - self.running_mean
-```
-
-**Key Characteristics:**
-
-**1. Not a Parameter (No Gradients):**
+<strong>Definition:</strong> <code>register_buffer()</code> registers a tensor as part of the model's state that should be saved/loaded but <strong>not</strong> trained (no gradients computed).
+<strong>Basic Usage:</strong>
 
 python
+<pre><code><span style="color: rgb(166, 38, 164);">class</span> <span style="color: rgb(183, 107, 1);">MyModel</span><span style="color: rgb(56, 58, 66);">(</span>nn<span style="color: rgb(56, 58, 66);">.</span>Module<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">__init__</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(80, 161, 79);">super</span><span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">.</span>__init__<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>fc <span style="color: rgb(64, 120, 242);">=</span> nn<span style="color: rgb(56, 58, 66);">.</span>Linear<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">10</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(183, 107, 1);">5</span><span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># Trainable parameter</span>
+        
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Register buffer - not trainable</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'running_mean'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>zeros<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">5</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+        
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">forward</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">,</span> x<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Use buffer like any tensor</span>
+        x <span style="color: rgb(64, 120, 242);">=</span> self<span style="color: rgb(56, 58, 66);">.</span>fc<span style="color: rgb(56, 58, 66);">(</span>x<span style="color: rgb(56, 58, 66);">)</span>
+        <span style="color: rgb(166, 38, 164);">return</span> x <span style="color: rgb(64, 120, 242);">-</span> self<span style="color: rgb(56, 58, 66);">.</span>running_mean</code></pre>
 
-```
-\# Parameters (trainable)
-list(model.parameters())  \# Contains fc.weight, fc.bias
-
-\# Buffers (not trainable)
-list(model.buffers())  \# Contains running_mean
-
-\# All tensors
-model.state_dict()  \# Contains both parameters AND buffers
-```
-
-**2. Saved/Loaded with Model:**
-
-python
-
-```
-\# Saving
-torch.save(model.state_dict(), 'model.pth')
-\# Saves both parameters AND buffers
-
-\# Loading
-model.load_state_dict(torch.load('model.pth'))
-\# Restores both parameters AND buffers
-```
-
-**3. Moved with Model:**
+<strong>Key Characteristics:</strong>
+<strong>1. Not a Parameter (No Gradients):</strong>
 
 python
+<pre><code><span style="color: rgb(160, 161, 167); font-style: italic;"># Parameters (trainable)</span>
+<span style="color: rgb(80, 161, 79);">list</span><span style="color: rgb(56, 58, 66);">(</span>model<span style="color: rgb(56, 58, 66);">.</span>parameters<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># Contains fc.weight, fc.bias</span>
 
-```
-model.to('cuda')  \# Moves parameters AND buffers to GPU
-model.to('cpu')   \# Moves everything back to CPU
-```
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Buffers (not trainable)</span>
+<span style="color: rgb(80, 161, 79);">list</span><span style="color: rgb(56, 58, 66);">(</span>model<span style="color: rgb(56, 58, 66);">.</span>buffers<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># Contains running_mean</span>
 
-**When to Use Buffers:**
+<span style="color: rgb(160, 161, 167); font-style: italic;"># All tensors</span>
+model<span style="color: rgb(56, 58, 66);">.</span>state_dict<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># Contains both parameters AND buffers</span></code></pre>
 
-**1. Running Statistics (BatchNorm):**
-
-python
-
-```
-class BatchNorm(nn.Module):
-    def __init__(self, num_features):
-        super().__init__()
-        \# Trainable parameters
-        self.weight = nn.Parameter(torch.ones(num_features))
-        self.bias = nn.Parameter(torch.zeros(num_features))
-  
-        \# Buffers for running statistics
-        self.register_buffer('running_mean', torch.zeros(num_features))
-        self.register_buffer('running_var', torch.ones(num_features))
-        self.register_buffer('num_batches_tracked', torch.tensor(0))
-```
-
-**2. Fixed Masks/Constants:**
+<strong>2. Saved/Loaded with Model:</strong>
 
 python
+<pre><code><span style="color: rgb(160, 161, 167); font-style: italic;"># Saving</span>
+torch<span style="color: rgb(56, 58, 66);">.</span>save<span style="color: rgb(56, 58, 66);">(</span>model<span style="color: rgb(56, 58, 66);">.</span>state_dict<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(80, 161, 79);">'model.pth'</span><span style="color: rgb(56, 58, 66);">)</span>
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Saves both parameters AND buffers</span>
 
-```
-class CausalAttention(nn.Module):
-    def __init__(self, max_len):
-        super().__init__()
-        \# Causal mask doesn't need gradients
-        mask = torch.triu(torch.ones(max_len, max_len), diagonal=1).bool()
-        self.register_buffer('causal_mask', mask)
-  
-    def forward(self, x):
-        \# Use pre-computed mask
-        scores = scores.masked_fill(self.causal_mask, float('-inf'))
-```
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Loading</span>
+model<span style="color: rgb(56, 58, 66);">.</span>load_state_dict<span style="color: rgb(56, 58, 66);">(</span>torch<span style="color: rgb(56, 58, 66);">.</span>load<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'model.pth'</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Restores both parameters AND buffers</span></code></pre>
 
-**3. Positional Encodings:**
+<strong>3. Moved with Model:</strong>
 
 python
+<pre><code>model<span style="color: rgb(56, 58, 66);">.</span>to<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'cuda'</span><span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># Moves parameters AND buffers to GPU</span>
+model<span style="color: rgb(56, 58, 66);">.</span>to<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'cpu'</span><span style="color: rgb(56, 58, 66);">)</span>   <span style="color: rgb(160, 161, 167); font-style: italic;"># Moves everything back to CPU</span></code></pre>
 
-```
-class PositionalEncoding(nn.Module):
-    def __init__(self, d_model, max_len):
-        super().__init__()
-        \# Pre-compute sinusoidal encodings
-        pe = self._create_positional_encoding(d_model, max_len)
-        self.register_buffer('pe', pe)
-  
-    def forward(self, x):
-        return x \+ self.pe[:x.size(1)]
-```
-
-**Buffer vs Parameter vs Regular Tensor:**
+<strong>When to Use Buffers:</strong>
+<strong>1. Running Statistics (BatchNorm):</strong>
 
 python
+<pre><code><span style="color: rgb(166, 38, 164);">class</span> <span style="color: rgb(183, 107, 1);">BatchNorm</span><span style="color: rgb(56, 58, 66);">(</span>nn<span style="color: rgb(56, 58, 66);">.</span>Module<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">__init__</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">,</span> num_features<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(80, 161, 79);">super</span><span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">.</span>__init__<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Trainable parameters</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>weight <span style="color: rgb(64, 120, 242);">=</span> nn<span style="color: rgb(56, 58, 66);">.</span>Parameter<span style="color: rgb(56, 58, 66);">(</span>torch<span style="color: rgb(56, 58, 66);">.</span>ones<span style="color: rgb(56, 58, 66);">(</span>num_features<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>bias <span style="color: rgb(64, 120, 242);">=</span> nn<span style="color: rgb(56, 58, 66);">.</span>Parameter<span style="color: rgb(56, 58, 66);">(</span>torch<span style="color: rgb(56, 58, 66);">.</span>zeros<span style="color: rgb(56, 58, 66);">(</span>num_features<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+        
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Buffers for running statistics</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'running_mean'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>zeros<span style="color: rgb(56, 58, 66);">(</span>num_features<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'running_var'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>ones<span style="color: rgb(56, 58, 66);">(</span>num_features<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'num_batches_tracked'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>tensor<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">0</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span></code></pre>
 
-```
-class ComparisonModel(nn.Module):
-    def __init__(self):
-        super().__init__()
-  
-        \# 1. Parameter - trainable, saved, moved with model
-        self.weight = nn.Parameter(torch.randn(10, 10))
-  
-        \# 2. Buffer - NOT trainable, saved, moved with model
-        self.register_buffer('mask', torch.ones(10))
-  
-        \# 3. Regular attribute - NOT trainable, NOT saved, NOT moved
-        self.temp = torch.zeros(10)
-
-model = ComparisonModel()
-
-\# Moving to GPU
-model.to('cuda')
-\# weight: ✓ moved to cuda
-\# mask: ✓ moved to cuda
-\# temp: ✗ still on cpu!
-
-\# Saving
-torch.save(model.state_dict(), 'model.pth')
-\# weight: ✓ saved
-\# mask: ✓ saved
-\# temp: ✗ NOT saved
-
-\# Gradients
-model.weight.requires_grad  \# True
-model.mask.requires_grad    \# False
-model.temp.requires_grad    \# False (if even still exists)
-```
-
-**Persistent vs Non-Persistent Buffers:**
+<strong>2. Fixed Masks/Constants:</strong>
 
 python
+<pre><code><span style="color: rgb(166, 38, 164);">class</span> <span style="color: rgb(183, 107, 1);">CausalAttention</span><span style="color: rgb(56, 58, 66);">(</span>nn<span style="color: rgb(56, 58, 66);">.</span>Module<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">__init__</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">,</span> max_len<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(80, 161, 79);">super</span><span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">.</span>__init__<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Causal mask doesn't need gradients</span>
+        mask <span style="color: rgb(64, 120, 242);">=</span> torch<span style="color: rgb(56, 58, 66);">.</span>triu<span style="color: rgb(56, 58, 66);">(</span>torch<span style="color: rgb(56, 58, 66);">.</span>ones<span style="color: rgb(56, 58, 66);">(</span>max_len<span style="color: rgb(56, 58, 66);">,</span> max_len<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">,</span> diagonal<span style="color: rgb(64, 120, 242);">=</span><span style="color: rgb(183, 107, 1);">1</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">.</span><span style="color: rgb(80, 161, 79);">bool</span><span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'causal_mask'</span><span style="color: rgb(56, 58, 66);">,</span> mask<span style="color: rgb(56, 58, 66);">)</span>
+    
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">forward</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">,</span> x<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Use pre-computed mask</span>
+        scores <span style="color: rgb(64, 120, 242);">=</span> scores<span style="color: rgb(56, 58, 66);">.</span>masked_fill<span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">.</span>causal_mask<span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(80, 161, 79);">float</span><span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'-inf'</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span></code></pre>
 
-```
-\# Persistent buffer (default) - saved in state_dict
-self.register_buffer('running_mean', torch.zeros(5), persistent=True)
-
-\# Non-persistent buffer - NOT saved in state_dict, but still moved with model
-self.register_buffer('temp_cache', torch.zeros(5), persistent=False)
-```
-
-**Common Use Cases Summary:**
-
-```
-| Use Case | Example | Why Buffer? |
-| --- | --- | --- |
-| Running stats | BatchNorm mean/var | Need to save, not train |
-| Fixed masks | Causal attention mask | Computed once, reused |
-| Positional encodings | Sinusoidal PE | Pre-computed constants |
-| Normalization constants | Dataset mean/std | Fixed preprocessing values |
-```
-
-**Practical Example - Normalization Layer:**
+<strong>3. Positional Encodings:</strong>
 
 python
+<pre><code><span style="color: rgb(166, 38, 164);">class</span> <span style="color: rgb(183, 107, 1);">PositionalEncoding</span><span style="color: rgb(56, 58, 66);">(</span>nn<span style="color: rgb(56, 58, 66);">.</span>Module<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">__init__</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">,</span> d_model<span style="color: rgb(56, 58, 66);">,</span> max_len<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(80, 161, 79);">super</span><span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">.</span>__init__<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Pre-compute sinusoidal encodings</span>
+        pe <span style="color: rgb(64, 120, 242);">=</span> self<span style="color: rgb(56, 58, 66);">.</span>_create_positional_encoding<span style="color: rgb(56, 58, 66);">(</span>d_model<span style="color: rgb(56, 58, 66);">,</span> max_len<span style="color: rgb(56, 58, 66);">)</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'pe'</span><span style="color: rgb(56, 58, 66);">,</span> pe<span style="color: rgb(56, 58, 66);">)</span>
+    
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">forward</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">,</span> x<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(166, 38, 164);">return</span> x <span style="color: rgb(64, 120, 242);">+</span> self<span style="color: rgb(56, 58, 66);">.</span>pe<span style="color: rgb(56, 58, 66);">[</span><span style="color: rgb(56, 58, 66);">:</span>x<span style="color: rgb(56, 58, 66);">.</span>size<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">1</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">]</span></code></pre>
 
-```
-class NormalizeLayer(nn.Module):
-    def __init__(self, mean, std):
-        super().__init__()
-        \# Register as buffers so they move with model
-        self.register_buffer('mean', torch.tensor(mean))
-        self.register_buffer('std', torch.tensor(std))
-  
-    def forward(self, x):
-        \# Normalize using stored statistics
-        return (x - self.mean) / self.std
+<strong>Buffer vs Parameter vs Regular Tensor:</strong>
 
-\# Usage
-model = NormalizeLayer(mean=[0.485, 0.456, 0.406],
-                       std=[0.229, 0.224, 0.225])
-model.to('cuda')  \# mean and std automatically moved to GPU
-```
+python
+<pre><code><span style="color: rgb(166, 38, 164);">class</span> <span style="color: rgb(183, 107, 1);">ComparisonModel</span><span style="color: rgb(56, 58, 66);">(</span>nn<span style="color: rgb(56, 58, 66);">.</span>Module<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">__init__</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(80, 161, 79);">super</span><span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">.</span>__init__<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>
+        
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># 1. Parameter - trainable, saved, moved with model</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>weight <span style="color: rgb(64, 120, 242);">=</span> nn<span style="color: rgb(56, 58, 66);">.</span>Parameter<span style="color: rgb(56, 58, 66);">(</span>torch<span style="color: rgb(56, 58, 66);">.</span>randn<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">10</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(183, 107, 1);">10</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+        
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># 2. Buffer - NOT trainable, saved, moved with model</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'mask'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>ones<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">10</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+        
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># 3. Regular attribute - NOT trainable, NOT saved, NOT moved</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>temp <span style="color: rgb(64, 120, 242);">=</span> torch<span style="color: rgb(56, 58, 66);">.</span>zeros<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">10</span><span style="color: rgb(56, 58, 66);">)</span>
 
-**Key Takeaway:** `register_buffer()` creates tensors that are part of the model's state (saved/loaded and moved with the model) but are **not trainable parameters**. Essential for running statistics, fixed masks, and pre-computed constants that need to persist with the model.
+model <span style="color: rgb(64, 120, 242);">=</span> ComparisonModel<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>
+
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Moving to GPU</span>
+model<span style="color: rgb(56, 58, 66);">.</span>to<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'cuda'</span><span style="color: rgb(56, 58, 66);">)</span>
+<span style="color: rgb(160, 161, 167); font-style: italic;"># weight: ✓ moved to cuda</span>
+<span style="color: rgb(160, 161, 167); font-style: italic;"># mask: ✓ moved to cuda</span>
+<span style="color: rgb(160, 161, 167); font-style: italic;"># temp: ✗ still on cpu!</span>
+
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Saving</span>
+torch<span style="color: rgb(56, 58, 66);">.</span>save<span style="color: rgb(56, 58, 66);">(</span>model<span style="color: rgb(56, 58, 66);">.</span>state_dict<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(80, 161, 79);">'model.pth'</span><span style="color: rgb(56, 58, 66);">)</span>
+<span style="color: rgb(160, 161, 167); font-style: italic;"># weight: ✓ saved</span>
+<span style="color: rgb(160, 161, 167); font-style: italic;"># mask: ✓ saved</span>
+<span style="color: rgb(160, 161, 167); font-style: italic;"># temp: ✗ NOT saved</span>
+
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Gradients</span>
+model<span style="color: rgb(56, 58, 66);">.</span>weight<span style="color: rgb(56, 58, 66);">.</span>requires_grad  <span style="color: rgb(160, 161, 167); font-style: italic;"># True</span>
+model<span style="color: rgb(56, 58, 66);">.</span>mask<span style="color: rgb(56, 58, 66);">.</span>requires_grad    <span style="color: rgb(160, 161, 167); font-style: italic;"># False</span>
+model<span style="color: rgb(56, 58, 66);">.</span>temp<span style="color: rgb(56, 58, 66);">.</span>requires_grad    <span style="color: rgb(160, 161, 167); font-style: italic;"># False (if even still exists)</span></code></pre>
+
+<strong>Persistent vs Non-Persistent Buffers:</strong>
+
+python
+<pre><code><span style="color: rgb(160, 161, 167); font-style: italic;"># Persistent buffer (default) - saved in state_dict</span>
+self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'running_mean'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>zeros<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">5</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">,</span> persistent<span style="color: rgb(64, 120, 242);">=</span><span style="color: rgb(183, 107, 1);">True</span><span style="color: rgb(56, 58, 66);">)</span>
+
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Non-persistent buffer - NOT saved in state_dict, but still moved with model</span>
+self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'temp_cache'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>zeros<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(183, 107, 1);">5</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">,</span> persistent<span style="color: rgb(64, 120, 242);">=</span><span style="color: rgb(183, 107, 1);">False</span><span style="color: rgb(56, 58, 66);">)</span></code></pre>
+
+<strong>Common Use Cases Summary:</strong>
+<pre><table><tbody><tr><th>Use Case</th><th>Example</th><th>Why Buffer?</th></tr><tr><td>Running stats</td><td>BatchNorm mean/var</td><td>Need to save, not train</td></tr><tr><td>Fixed masks</td><td>Causal attention mask</td><td>Computed once, reused</td></tr><tr><td>Positional encodings</td><td>Sinusoidal PE</td><td>Pre-computed constants</td></tr><tr><td>Normalization constants</td><td>Dataset mean/std</td><td>Fixed preprocessing values</td></tr></tbody></table></pre><strong>Practical Example - Normalization Layer:</strong>
+
+python
+<pre><code><span style="color: rgb(166, 38, 164);">class</span> <span style="color: rgb(183, 107, 1);">NormalizeLayer</span><span style="color: rgb(56, 58, 66);">(</span>nn<span style="color: rgb(56, 58, 66);">.</span>Module<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">__init__</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">,</span> mean<span style="color: rgb(56, 58, 66);">,</span> std<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(80, 161, 79);">super</span><span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">.</span>__init__<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(56, 58, 66);">)</span>
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Register as buffers so they move with model</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'mean'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>tensor<span style="color: rgb(56, 58, 66);">(</span>mean<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+        self<span style="color: rgb(56, 58, 66);">.</span>register_buffer<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'std'</span><span style="color: rgb(56, 58, 66);">,</span> torch<span style="color: rgb(56, 58, 66);">.</span>tensor<span style="color: rgb(56, 58, 66);">(</span>std<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">)</span>
+    
+    <span style="color: rgb(166, 38, 164);">def</span> <span style="color: rgb(64, 120, 242);">forward</span><span style="color: rgb(56, 58, 66);">(</span>self<span style="color: rgb(56, 58, 66);">,</span> x<span style="color: rgb(56, 58, 66);">)</span><span style="color: rgb(56, 58, 66);">:</span>
+        <span style="color: rgb(160, 161, 167); font-style: italic;"># Normalize using stored statistics</span>
+        <span style="color: rgb(166, 38, 164);">return</span> <span style="color: rgb(56, 58, 66);">(</span>x <span style="color: rgb(64, 120, 242);">-</span> self<span style="color: rgb(56, 58, 66);">.</span>mean<span style="color: rgb(56, 58, 66);">)</span> <span style="color: rgb(64, 120, 242);">/</span> self<span style="color: rgb(56, 58, 66);">.</span>std
+
+<span style="color: rgb(160, 161, 167); font-style: italic;"># Usage</span>
+model <span style="color: rgb(64, 120, 242);">=</span> NormalizeLayer<span style="color: rgb(56, 58, 66);">(</span>mean<span style="color: rgb(64, 120, 242);">=</span><span style="color: rgb(56, 58, 66);">[</span><span style="color: rgb(183, 107, 1);">0.485</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(183, 107, 1);">0.456</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(183, 107, 1);">0.406</span><span style="color: rgb(56, 58, 66);">]</span><span style="color: rgb(56, 58, 66);">,</span> 
+                       std<span style="color: rgb(64, 120, 242);">=</span><span style="color: rgb(56, 58, 66);">[</span><span style="color: rgb(183, 107, 1);">0.229</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(183, 107, 1);">0.224</span><span style="color: rgb(56, 58, 66);">,</span> <span style="color: rgb(183, 107, 1);">0.225</span><span style="color: rgb(56, 58, 66);">]</span><span style="color: rgb(56, 58, 66);">)</span>
+model<span style="color: rgb(56, 58, 66);">.</span>to<span style="color: rgb(56, 58, 66);">(</span><span style="color: rgb(80, 161, 79);">'cuda'</span><span style="color: rgb(56, 58, 66);">)</span>  <span style="color: rgb(160, 161, 167); font-style: italic;"># mean and std automatically moved to GPU</span></code></pre>
+
+<strong>Key Takeaway:</strong> <code>register_buffer()</code> creates tensors that are part of the model's state (saved/loaded and moved with the model) but are <strong>not trainable parameters</strong>. Essential for running statistics, fixed masks, and pre-computed constants that need to persist with the model.
 
 ---
 
-<!-- note_key: 59b37e1bff41 -->
-BF: How does the @ operator work on `PyTorch`? How does it work for `len(shape) > 2`​?
-BB: **Definition:** The `@` operator performs matrix multiplication in PyTorch (equivalent to `torch.matmul()`).
+## How does the @ operator work on <code>PyTorch</code>? How does it work for <code>len(shape) > 2</code>​?
+*Basic · id 1760409360803*
 
-**Basic Cases:**
-
-**1. 2D × 2D (Standard Matrix Multiplication):**
-
-python
-
-```
-A = torch.randn(3, 4)  \# [3, 4]
-B = torch.randn(4, 5)  \# [4, 5]
-C = A @ B              \# [3, 5]
-
-\# Rule: (m, n) @ (n, p) = (m, p)
-\# Inner dimensions must match!
-```
-
-**2. 1D × 1D (Dot Product):**
+<strong>Definition:</strong> The <code>@</code> operator performs matrix multiplication in PyTorch (equivalent to <code>torch.matmul()</code>).
+<strong>Basic Cases:</strong>
+<strong>1. 2D × 2D (Standard Matrix Multiplication):</strong>
 
 python
+<pre><code>A = torch.randn(3, 4)  <span style="font-style: italic;"># [3, 4]</span>
+B = torch.randn(4, 5)  <span style="font-style: italic;"># [4, 5]</span>
+C = A @ B              <span style="font-style: italic;"># [3, 5]</span>
 
-```
-a = torch.randn(5)  \# [5]
-b = torch.randn(5)  \# [5]
-c = a @ b           \# scalar
+<span style="font-style: italic;"># Rule: (m, n) @ (n, p) = (m, p)</span>
+<span style="font-style: italic;"># Inner dimensions must match!</span></code></pre>
 
-\# Equivalent to: sum(a \* b)
-```
-
-**3. 2D × 1D (Matrix-Vector Product):**
+<strong>2. 1D × 1D (Dot Product):</strong>
 
 python
+<pre><code>a = torch.randn(5)  <span style="font-style: italic;"># [5]</span>
+b = torch.randn(5)  <span style="font-style: italic;"># [5]</span>
+c = a @ b           <span style="font-style: italic;"># scalar</span>
 
-```
-A = torch.randn(3, 4)  \# [3, 4]
-b = torch.randn(4)     \# [4]
-c = A @ b              \# [3]
+<span style="font-style: italic;"># Equivalent to: sum(a * b)</span></code></pre>
 
-\# Treats b as column vector
-```
-
-**Higher-Dimensional Behavior (len(shape) > 2):**
-
-**Key Rule:** The `@` operator treats the last two dimensions as matrices and performs **batched matrix multiplication** on them, while broadcasting over leading dimensions.
-
-**4. 3D × 3D (Batched Matrix Multiplication):**
+<strong>3. 2D × 1D (Matrix-Vector Product):</strong>
 
 python
+<pre><code>A = torch.randn(3, 4)  <span style="font-style: italic;"># [3, 4]</span>
+b = torch.randn(4)     <span style="font-style: italic;"># [4]</span>
+c = A @ b              <span style="font-style: italic;"># [3]</span>
 
-```
-A = torch.randn(10, 3, 4)  \# [batch, 3, 4]
-B = torch.randn(10, 4, 5)  \# [batch, 4, 5]
-C = A @ B                  \# [batch, 3, 5]
+<span style="font-style: italic;"># Treats b as column vector</span></code></pre>
 
-\# Performs 10 separate matrix multiplications:
-\# C[i] = A[i] @ B[i] for i in range(10)
-```
-
-**5. Broadcasting with Batch Dimensions:**
+<strong>Higher-Dimensional Behavior (len(shape) > 2):</strong>
+<strong>Key Rule:</strong> The <code>@</code> operator treats the last two dimensions as matrices and performs <strong>batched matrix multiplication</strong> on them, while broadcasting over leading dimensions.
+<strong>4. 3D × 3D (Batched Matrix Multiplication):</strong>
 
 python
+<pre><code>A = torch.randn(10, 3, 4)  <span style="font-style: italic;"># [batch, 3, 4]</span>
+B = torch.randn(10, 4, 5)  <span style="font-style: italic;"># [batch, 4, 5]</span>
+C = A @ B                  <span style="font-style: italic;"># [batch, 3, 5]</span>
 
-```
-\# Different batch sizes - broadcasts like other PyTorch ops
-A = torch.randn(2, 1, 3, 4)   \# [2, 1, 3, 4]
-B = torch.randn(1, 5, 4, 6)   \# [1, 5, 4, 6]
-C = A @ B                     \# [2, 5, 3, 6]
+<span style="font-style: italic;"># Performs 10 separate matrix multiplications:</span>
+<span style="font-style: italic;"># C[i] = A[i] @ B[i] for i in range(10)</span></code></pre>
 
-\# Broadcasting rules:
-\# - Last 2 dims: matrix multiply (3,4) @ (4,6) = (3,6)
-\# - Leading dims: broadcast (2,1) and (1,5) --> (2,5)
-```
-
-**Real-World Example - Transformer Attention:**
+<strong>5. Broadcasting with Batch Dimensions:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># Different batch sizes - broadcasts like other PyTorch ops</span>
+A = torch.randn(2, 1, 3, 4)   <span style="font-style: italic;"># [2, 1, 3, 4]</span>
+B = torch.randn(1, 5, 4, 6)   <span style="font-style: italic;"># [1, 5, 4, 6]</span>
+C = A @ B                     <span style="font-style: italic;"># [2, 5, 3, 6]</span>
 
-```
-\# Q, K, V in multi-head attention
+<span style="font-style: italic;"># Broadcasting rules:</span>
+<span style="font-style: italic;"># - Last 2 dims: matrix multiply (3,4) @ (4,6) = (3,6)</span>
+<span style="font-style: italic;"># - Leading dims: broadcast (2,1) and (1,5) → (2,5)</span></code></pre>
+
+<strong>Real-World Example - Transformer Attention:</strong>
+
+python
+<pre><code><span style="font-style: italic;"># Q, K, V in multi-head attention</span>
 batch_size = 32
 num_heads = 8
 seq_len = 100
 head_dim = 64
 
-Q = torch.randn(batch_size, num_heads, seq_len, head_dim)  \# [32, 8, 100, 64]
-K = torch.randn(batch_size, num_heads, seq_len, head_dim)  \# [32, 8, 100, 64]
-V = torch.randn(batch_size, num_heads, seq_len, head_dim)  \# [32, 8, 100, 64]
+Q = torch.randn(batch_size, num_heads, seq_len, head_dim)  <span style="font-style: italic;"># [32, 8, 100, 64]</span>
+K = torch.randn(batch_size, num_heads, seq_len, head_dim)  <span style="font-style: italic;"># [32, 8, 100, 64]</span>
+V = torch.randn(batch_size, num_heads, seq_len, head_dim)  <span style="font-style: italic;"># [32, 8, 100, 64]</span>
 
-\# Compute attention scores: Q @ K^T
-scores = Q @ K.transpose(-2, -1)  \# [32, 8, 100, 100]
-\# For each of 32 batches and 8 heads:
-\#   (100, 64) @ (64, 100) = (100, 100)
+<span style="font-style: italic;"># Compute attention scores: Q @ K^T</span>
+scores = Q @ K.transpose(-2, -1)  <span style="font-style: italic;"># [32, 8, 100, 100]</span>
+<span style="font-style: italic;"># For each of 32 batches and 8 heads:</span>
+<span style="font-style: italic;">#   (100, 64) @ (64, 100) = (100, 100)</span>
 
-\# Apply attention to values
-attention_weights = torch.softmax(scores, dim=-1)  \# [32, 8, 100, 100]
-output = attention_weights @ V  \# [32, 8, 100, 64]
-\# For each batch and head:
-\#   (100, 100) @ (100, 64) = (100, 64)
-```
+<span style="font-style: italic;"># Apply attention to values</span>
+attention_weights = torch.softmax(scores, dim=-1)  <span style="font-style: italic;"># [32, 8, 100, 100]</span>
+output = attention_weights @ V  <span style="font-style: italic;"># [32, 8, 100, 64]</span>
+<span style="font-style: italic;"># For each batch and head:</span>
+<span style="font-style: italic;">#   (100, 100) @ (100, 64) = (100, 64)</span></code></pre>
 
-**Dimension Rules Summary:**
+<strong>Dimension Rules Summary:</strong>
 
 python
-
-```
-\# Last 2 dimensions: matrix multiplication
-\# Earlier dimensions: batch dimensions (broadcasted)
+<pre><code><span style="font-style: italic;"># Last 2 dimensions: matrix multiplication</span>
+<span style="font-style: italic;"># Earlier dimensions: batch dimensions (broadcasted)</span>
 
 Shape compatibility:
 (..., m, n) @ (..., n, p) = (..., m, p)
@@ -911,547 +652,439 @@ Examples:
 [10, 3, 4] @ [10, 4, 5] = [10, 3, 5]        ✓
 [2, 3, 4] @ [4, 5] = [2, 3, 5]              ✓ (broadcasts)
 [5, 1, 3, 4] @ [1, 7, 4, 6] = [5, 7, 3, 6]  ✓ (broadcasts)
-[3, 4] @ [5, 6] = ERROR                      ✗ (4 =/= 5)
-```
+[3, 4] @ [5, 6] = ERROR                      ✗ (4 ≠ 5)</code></pre>
 
-**Common Patterns:**
-
-**1. Batch of Matrix-Vector Products:**
+<strong>Common Patterns:</strong>
+<strong>1. Batch of Matrix-Vector Products:</strong>
 
 python
+<pre><code>A = torch.randn(100, 3, 4)  <span style="font-style: italic;"># 100 matrices of size [3, 4]</span>
+x = torch.randn(100, 4, 1)  <span style="font-style: italic;"># 100 vectors of size [4]</span>
+y = A @ x                   <span style="font-style: italic;"># [100, 3, 1]</span></code></pre>
 
-```
-A = torch.randn(100, 3, 4)  \# 100 matrices of size [3, 4]
-x = torch.randn(100, 4, 1)  \# 100 vectors of size [4]
-y = A @ x                   \# [100, 3, 1]
-```
-
-**2. Single Matrix with Batch of Vectors:**
+<strong>2. Single Matrix with Batch of Vectors:</strong>
 
 python
+<pre><code>A = torch.randn(3, 4)       <span style="font-style: italic;"># Single matrix [3, 4]</span>
+X = torch.randn(100, 4, 1)  <span style="font-style: italic;"># 100 vectors [100, 4, 1]</span>
+Y = A @ X                   <span style="font-style: italic;"># [100, 3, 1] - broadcasts A</span></code></pre>
 
-```
-A = torch.randn(3, 4)       \# Single matrix [3, 4]
-X = torch.randn(100, 4, 1)  \# 100 vectors [100, 4, 1]
-Y = A @ X                   \# [100, 3, 1] - broadcasts A
-```
-
-**3. Einstein Notation Alternative:**
+<strong>3. Einstein Notation Alternative:</strong>
 
 python
-
-```
-\# @ operator
+<pre><code><span style="font-style: italic;"># @ operator</span>
 C = A @ B
 
-\# Equivalent with einsum (more explicit)
-C = torch.einsum('...ij,...jk->...ik', A, B)
-```
+<span style="font-style: italic;"># Equivalent with einsum (more explicit)</span>
+C = torch.einsum('...ij,...jk->...ik', A, B)</code></pre>
 
-**Comparison with Other Operations:**
+<strong>Comparison with Other Operations:</strong>
 
 python
-
-```
-A = torch.randn(2, 3, 4)
+<pre><code>A = torch.randn(2, 3, 4)
 B = torch.randn(2, 4, 5)
 
-\# Matrix multiplication
-A @ B              \# [2, 3, 5] - last 2 dims multiply
+<span style="font-style: italic;"># Matrix multiplication</span>
+A @ B              <span style="font-style: italic;"># [2, 3, 5] - last 2 dims multiply</span>
 
-\# Element-wise multiplication
-A * B              \# Broadcasting error (shapes don't match)
+<span style="font-style: italic;"># Element-wise multiplication</span>
+A * B              <span style="font-style: italic;"># Broadcasting error (shapes don't match)</span>
 
-\# Batch matrix multiply (explicit)
-torch.bmm(A, B)    \# [2, 3, 5] - requires 3D exactly
+<span style="font-style: italic;"># Batch matrix multiply (explicit)</span>
+torch.bmm(A, B)    <span style="font-style: italic;"># [2, 3, 5] - requires 3D exactly</span>
 
-\# General matmul (most flexible)
-torch.matmul(A, B) \# [2, 3, 5] - same as @
-```
+<span style="font-style: italic;"># General matmul (most flexible)</span>
+torch.matmul(A, B) <span style="font-style: italic;"># [2, 3, 5] - same as @</span></code></pre>
 
-**Key Differences:**
-
-```
-| Operation | Dimensions | Broadcasting | Use Case |
-| --- | --- | --- | --- |
-| @ | Any (≥1D) | Yes | General purpose |
-| torch.mm | Exactly 2D | No | Simple matrices only |
-| torch.bmm | Exactly 3D | No | Batched, no broadcasting |
-| torch.matmul | Any | Yes | Same as @ |
-```
-
-**Key Takeaway:** The `@` operator performs matrix multiplication on the **last two dimensions** while treating all earlier dimensions as batch dimensions that follow broadcasting rules. Essential for batched operations in neural networks, especially in attention mechanisms.
+<strong>Key Differences:</strong>
+<pre><table><tbody><tr><th>Operation</th><th>Dimensions</th><th>Broadcasting</th><th>Use Case</th></tr><tr><td><code>@</code></td><td>Any (≥1D)</td><td>Yes</td><td>General purpose</td></tr><tr><td><code>torch.mm</code></td><td>Exactly 2D</td><td>No</td><td>Simple matrices only</td></tr><tr><td><code>torch.bmm</code></td><td>Exactly 3D</td><td>No</td><td>Batched, no broadcasting</td></tr><tr><td><code>torch.matmul</code></td><td>Any</td><td>Yes</td><td>Same as @</td></tr></tbody></table></pre><strong>Key Takeaway:</strong> The <code>@</code> operator performs matrix multiplication on the <strong>last two dimensions</strong> while treating all earlier dimensions as batch dimensions that follow broadcasting rules. Essential for batched operations in neural networks, especially in attention mechanisms.
 
 ---
 
-<!-- note_key: 654195592018 -->
-BF: How does `.view` transform tensors in `PyTorch`? Specifically how does it work for `len(shape) > 2`
-BB: **Definition:** `.view()` reshapes a tensor without copying data. It returns a new view with different dimensions but sharing the same underlying memory.
+## How does <code>.view</code> transform tensors in <code>PyTorch</code>? Specifically how does it work for <code>len(shape) > 2</code>
+*Basic · id 1760409532653*
 
-**Basic Principle:** Elements are stored in **row-major (C-contiguous) order** in memory. `.view()` reinterprets this flat sequence with new dimensions.
-
-**Simple Examples:**
+<strong>Definition:</strong> <code>.view()</code> reshapes a tensor without copying data. It returns a new view with different dimensions but sharing the same underlying memory.
+<strong>Basic Principle:</strong> Elements are stored in <strong>row-major (C-contiguous) order</strong> in memory. <code>.view()</code> reinterprets this flat sequence with new dimensions.
+<strong>Simple Examples:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># 1D to 2D</span>
+x = torch.tensor([1, 2, 3, 4, 5, 6])  <span style="font-style: italic;"># [6]</span>
+y = x.view(2, 3)  <span style="font-style: italic;"># [2, 3]</span>
+<span style="font-style: italic;"># [[1, 2, 3],</span>
+<span style="font-style: italic;">#  [4, 5, 6]]</span>
 
-```
-\# 1D to 2D
-x = torch.tensor([1, 2, 3, 4, 5, 6])  \# [6]
-y = x.view(2, 3)  \# [2, 3]
-\# [[1, 2, 3],
-\#  [4, 5, 6]]
+<span style="font-style: italic;"># 2D to 1D (flatten)</span>
+z = y.view(-1)  <span style="font-style: italic;"># [6] - same as x</span>
+<span style="font-style: italic;"># [1, 2, 3, 4, 5, 6]</span>
 
-\# 2D to 1D (flatten)
-z = y.view(-1)  \# [6] - same as x
-\# [1, 2, 3, 4, 5, 6]
-
-\# Using -1 for automatic dimension inference
+<span style="font-style: italic;"># Using -1 for automatic dimension inference</span>
 x = torch.randn(24)
-y = x.view(4, -1)  \# [4, 6] - PyTorch infers 6
-```
+y = x.view(4, -1)  <span style="font-style: italic;"># [4, 6] - PyTorch infers 6</span></code></pre>
 
-**How It Works (Memory Layout):**
+<strong>How It Works (Memory Layout):</strong>
 
 python
-
-```
-\# Memory is always a flat 1D array
+<pre><code><span style="font-style: italic;"># Memory is always a flat 1D array</span>
 x = torch.tensor([[1, 2, 3],
-                  [4, 5, 6]])  \# Shape: [2, 3]
+                  [4, 5, 6]])  <span style="font-style: italic;"># Shape: [2, 3]</span>
 
-\# In memory: [1, 2, 3, 4, 5, 6]
-\#             ↑row 0↑  ↑row 1↑
+<span style="font-style: italic;"># In memory: [1, 2, 3, 4, 5, 6]</span>
+<span style="font-style: italic;">#             ↑row 0↑  ↑row 1↑</span>
 
-\# Reshape to [3, 2]
+<span style="font-style: italic;"># Reshape to [3, 2]</span>
 y = x.view(3, 2)
-\# [[1, 2],    ← elements 0-1
-\#  [3, 4],    ← elements 2-3
-\#  [5, 6]]    ← elements 4-5
+<span style="font-style: italic;"># [[1, 2],    ← elements 0-1</span>
+<span style="font-style: italic;">#  [3, 4],    ← elements 2-3</span>
+<span style="font-style: italic;">#  [5, 6]]    ← elements 4-5</span>
 
-\# Same memory, different interpretation!
-```
+<span style="font-style: italic;"># Same memory, different interpretation!</span></code></pre>
 
-**Higher Dimensions (len(shape) > 2):**
-
-**Key Insight:** The **rightmost dimensions vary fastest** in memory (row-major order).
+<strong>Higher Dimensions (len(shape) > 2):</strong>
+<strong>Key Insight:</strong> The <strong>rightmost dimensions vary fastest</strong> in memory (row-major order).
 
 python
+<pre><code><span style="font-style: italic;"># 3D tensor</span>
+x = torch.arange(24).view(2, 3, 4)  <span style="font-style: italic;"># [2, 3, 4]</span>
+<span style="font-style: italic;"># Shape: [batch=2, rows=3, cols=4]</span>
 
-```
-\# 3D tensor
-x = torch.arange(24).view(2, 3, 4)  \# [2, 3, 4]
-\# Shape: [batch=2, rows=3, cols=4]
-
-\# Memory layout:
-\# [0,1,2,3,  4,5,6,7,  8,9,10,11,  12,13,14,15,  16,17,18,19,  20,21,22,23]
-\#  ↑batch 0, row 0↑  ↑b0,r1↑  ↑b0,r2↑  ↑batch 1, row 0↑  ↑b1,r1↑  ↑b1,r2↑
+<span style="font-style: italic;"># Memory layout:</span>
+<span style="font-style: italic;"># [0,1,2,3,  4,5,6,7,  8,9,10,11,  12,13,14,15,  16,17,18,19,  20,21,22,23]</span>
+<span style="font-style: italic;">#  ↑batch 0, row 0↑  ↑b0,r1↑  ↑b0,r2↑  ↑batch 1, row 0↑  ↑b1,r1↑  ↑b1,r2↑</span>
 
 print(x)
-\# [[[0,  1,  2,  3],
-\#   [4,  5,  6,  7],
-\#   [8,  9,  10, 11]],
-\#
-\#  [[12, 13, 14, 15],
-\#   [16, 17, 18, 19],
-\#   [20, 21, 22, 23]]]
-```
+<span style="font-style: italic;"># [[[0,  1,  2,  3],</span>
+<span style="font-style: italic;">#   [4,  5,  6,  7],</span>
+<span style="font-style: italic;">#   [8,  9,  10, 11]],</span>
+<span style="font-style: italic;">#</span>
+<span style="font-style: italic;">#  [[12, 13, 14, 15],</span>
+<span style="font-style: italic;">#   [16, 17, 18, 19],</span>
+<span style="font-style: italic;">#   [20, 21, 22, 23]]]</span></code></pre>
 
-**Practical Example - Reshaping in Transformers:**
+<strong>Practical Example - Reshaping in Transformers:</strong>
 
 python
-
-```
-\# Multi-head attention: reshape for parallel head computation
+<pre><code><span style="font-style: italic;"># Multi-head attention: reshape for parallel head computation</span>
 batch_size = 32
 seq_len = 100
 d_model = 512
 num_heads = 8
-head_dim = d_model // num_heads  \# 64
+head_dim = d_model // num_heads  <span style="font-style: italic;"># 64</span>
 
-\# Linear projection output: [32, 100, 512]
+<span style="font-style: italic;"># Linear projection output: [32, 100, 512]</span>
 Q = torch.randn(batch_size, seq_len, d_model)
 
-\# Reshape to separate heads: [32, 100, 8, 64]
+<span style="font-style: italic;"># Reshape to separate heads: [32, 100, 8, 64]</span>
 Q = Q.view(batch_size, seq_len, num_heads, head_dim)
 
-\# Transpose for batched matmul: [32, 8, 100, 64]
+<span style="font-style: italic;"># Transpose for batched matmul: [32, 8, 100, 64]</span>
 Q = Q.transpose(1, 2)
 
-\# Now can do batched attention per head!
-```
+<span style="font-style: italic;"># Now can do batched attention per head!</span></code></pre>
 
-**Complex Reshaping Example:**
-
-python
-
-```
-\# Start with 4D tensor
-x = torch.arange(120).view(2, 3, 4, 5)  \# [2, 3, 4, 5]
-print(x.shape)  \# torch.Size([2, 3, 4, 5])
-
-\# Reshape to merge middle dimensions
-y = x.view(2, 12, 5)  \# [2, 12, 5]
-\# Groups (3\*4=12) middle elements together
-
-\# Reshape to split dimensions
-z = x.view(2, 3, 2, 2, 5)  \# [2, 3, 2, 2, 5]
-\# Splits dim 2 (size 4) into (2, 2)
-
-\# Flatten all but batch dimension
-w = x.view(2, -1)  \# [2, 60]
-\# Common pattern: keep batch, flatten rest
-```
-
-**Flattening Patterns:**
+<strong>Complex Reshaping Example:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># Start with 4D tensor</span>
+x = torch.arange(120).view(2, 3, 4, 5)  <span style="font-style: italic;"># [2, 3, 4, 5]</span>
+print(x.shape)  <span style="font-style: italic;"># torch.Size([2, 3, 4, 5])</span>
 
-```
-\# Input image: [batch, channels, height, width]
-x = torch.randn(32, 3, 224, 224)  \# [32, 3, 224, 224]
+<span style="font-style: italic;"># Reshape to merge middle dimensions</span>
+y = x.view(2, 12, 5)  <span style="font-style: italic;"># [2, 12, 5]</span>
+<span style="font-style: italic;"># Groups (3*4=12) middle elements together</span>
 
-\# Flatten spatial dimensions
-x = x.view(32, 3, -1)  \# [32, 3, 50176]
+<span style="font-style: italic;"># Reshape to split dimensions</span>
+z = x.view(2, 3, 2, 2, 5)  <span style="font-style: italic;"># [2, 3, 2, 2, 5]</span>
+<span style="font-style: italic;"># Splits dim 2 (size 4) into (2, 2)</span>
 
-\# Flatten everything except batch
-x = x.view(32, -1)  \# [32, 150528]
+<span style="font-style: italic;"># Flatten all but batch dimension</span>
+w = x.view(2, -1)  <span style="font-style: italic;"># [2, 60]</span>
+<span style="font-style: italic;"># Common pattern: keep batch, flatten rest</span></code></pre>
 
-\# Complete flatten
-x = x.view(-1)  \# [4816896] - single 1D tensor
-```
-
-**Important Constraints:**
-
-**1. Total elements must match:**
-
-python
-
-```
-x = torch.randn(2, 3, 4)  \# 24 elements
-y = x.view(4, 6)          \# ✓ 24 elements
-z = x.view(5, 5)          \# ✗ Error: 25 =/= 24
-```
-
-**2. Tensor must be contiguous:**
+<strong>Flattening Patterns:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># Input image: [batch, channels, height, width]</span>
+x = torch.randn(32, 3, 224, 224)  <span style="font-style: italic;"># [32, 3, 224, 224]</span>
 
-```
-x = torch.randn(2, 3, 4)
-y = x.transpose(0, 1)     \# Non-contiguous!
-z = y.view(-1)            \# ✗ Error
+<span style="font-style: italic;"># Flatten spatial dimensions</span>
+x = x.view(32, 3, -1)  <span style="font-style: italic;"># [32, 3, 50176]</span>
 
-\# Fix: make contiguous first
-z = y.contiguous().view(-1)  \# ✓ Works
-\# Or use reshape (handles non-contiguous automatically)
-z = y.reshape(-1)         \# ✓ Works
-```
+<span style="font-style: italic;"># Flatten everything except batch</span>
+x = x.view(32, -1)  <span style="font-style: italic;"># [32, 150528]</span>
 
-**Common Patterns in Neural Networks:**
+<span style="font-style: italic;"># Complete flatten</span>
+x = x.view(-1)  <span style="font-style: italic;"># [4816896] - single 1D tensor</span></code></pre>
 
-**1. Batch Flattening (CNN --> FC):**
+<strong>Important Constraints:</strong>
+<strong>1. Total elements must match:</strong>
 
 python
+<pre><code>x = torch.randn(2, 3, 4)  <span style="font-style: italic;"># 24 elements</span>
+y = x.view(4, 6)          <span style="font-style: italic;"># ✓ 24 elements</span>
+z = x.view(5, 5)          <span style="font-style: italic;"># ✗ Error: 25 ≠ 24</span></code></pre>
 
-```
-\# After conv layers: [batch, channels, H, W]
+<strong>2. Tensor must be contiguous:</strong>
+
+python
+<pre><code>x = torch.randn(2, 3, 4)
+y = x.transpose(0, 1)     <span style="font-style: italic;"># Non-contiguous!</span>
+z = y.view(-1)            <span style="font-style: italic;"># ✗ Error</span>
+
+<span style="font-style: italic;"># Fix: make contiguous first</span>
+z = y.contiguous().view(-1)  <span style="font-style: italic;"># ✓ Works</span>
+<span style="font-style: italic;"># Or use reshape (handles non-contiguous automatically)</span>
+z = y.reshape(-1)         <span style="font-style: italic;"># ✓ Works</span></code></pre>
+
+<strong>Common Patterns in Neural Networks:</strong>
+<strong>1. Batch Flattening (CNN → FC):</strong>
+
+python
+<pre><code><span style="font-style: italic;"># After conv layers: [batch, channels, H, W]</span>
 x = torch.randn(32, 64, 7, 7)
-x = x.view(32, -1)  \# [32, 3136] for fully connected layer
-```
+x = x.view(32, -1)  <span style="font-style: italic;"># [32, 3136] for fully connected layer</span></code></pre>
 
-**2. Multi-Head Attention Reshaping:**
-
-python
-
-```
-\# Split embedding into multiple heads
-x = torch.randn(32, 100, 512)  \# [batch, seq, embedding]
-x = x.view(32, 100, 8, 64)     \# [batch, seq, heads, head_dim]
-x = x.transpose(1, 2)          \# [batch, heads, seq, head_dim]
-```
-
-**3. Combining Batch and Sequence:**
+<strong>2. Multi-Head Attention Reshaping:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># Split embedding into multiple heads</span>
+x = torch.randn(32, 100, 512)  <span style="font-style: italic;"># [batch, seq, embedding]</span>
+x = x.view(32, 100, 8, 64)     <span style="font-style: italic;"># [batch, seq, heads, head_dim]</span>
+x = x.transpose(1, 2)          <span style="font-style: italic;"># [batch, heads, seq, head_dim]</span></code></pre>
 
-```
-\# Process all sequences together
-x = torch.randn(32, 10, 512)  \# [batch, seq, features]
-x = x.view(-1, 512)           \# [320, features] - merge batch & seq
-```
-
-**.view() vs .reshape() vs .flatten():**
+<strong>3. Combining Batch and Sequence:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># Process all sequences together</span>
+x = torch.randn(32, 10, 512)  <span style="font-style: italic;"># [batch, seq, features]</span>
+x = x.view(-1, 512)           <span style="font-style: italic;"># [320, features] - merge batch & seq</span></code></pre>
 
-```
-x = torch.randn(2, 3, 4)
+<strong>.view() vs .reshape() vs .flatten():</strong>
 
-\# .view() - requires contiguous, no copy
-y = x.view(2, 12)  \# Fails if non-contiguous
+python
+<pre><code>x = torch.randn(2, 3, 4)
 
-\# .reshape() - handles non-contiguous, may copy
-y = x.reshape(2, 12)  \# Always works
+<span style="font-style: italic;"># .view() - requires contiguous, no copy</span>
+y = x.view(2, 12)  <span style="font-style: italic;"># Fails if non-contiguous</span>
 
-\# .flatten() - specialized for flattening
-y = x.flatten()        \# [24] - flatten all dims
-y = x.flatten(1)       \# [2, 12] - flatten from dim 1 onward
-```
+<span style="font-style: italic;"># .reshape() - handles non-contiguous, may copy</span>
+y = x.reshape(2, 12)  <span style="font-style: italic;"># Always works</span>
 
-**Key Takeaway:** `.view()` reinterprets tensor memory with new dimensions following row-major order (rightmost dimensions vary fastest). Total elements must match, and tensor must be contiguous. Essential for reshaping in neural networks, especially for batched operations and dimension manipulation in attention mechanisms.
+<span style="font-style: italic;"># .flatten() - specialized for flattening</span>
+y = x.flatten()        <span style="font-style: italic;"># [24] - flatten all dims</span>
+y = x.flatten(1)       <span style="font-style: italic;"># [2, 12] - flatten from dim 1 onward</span></code></pre>
+
+<strong>Key Takeaway:</strong> <code>.view()</code> reinterprets tensor memory with new dimensions following row-major order (rightmost dimensions vary fastest). Total elements must match, and tensor must be contiguous. Essential for reshaping in neural networks, especially for batched operations and dimension manipulation in attention mechanisms.
 
 ---
 
-<!-- note_key: b493a2ee1322 -->
-BF: How does `.transpose` transform tensors in `PyTorch`? Specifically how does it work for `len(shape) > 2`
-BB: **Definition:** `.transpose(dim0, dim1)` swaps two specified dimensions of a tensor. Returns a view (no data copying) but makes the tensor **non-contiguous**.
+## How does <code>.transpose</code> transform tensors in <code>PyTorch</code>? Specifically how does it work for <code>len(shape) > 2</code>
+*Basic · id 1760409607500*
 
-**Basic Usage:**
+<strong>Definition:</strong> <code>.transpose(dim0, dim1)</code> swaps two specified dimensions of a tensor. Returns a view (no data copying) but makes the tensor <strong>non-contiguous</strong>.
+<strong>Basic Usage:</strong>
 
 python
-
-```
-\# 2D transpose (matrix transpose)
+<pre><code><span style="font-style: italic;"># 2D transpose (matrix transpose)</span>
 x = torch.tensor([[1, 2, 3],
-                  [4, 5, 6]])  \# [2, 3]
+                  [4, 5, 6]])  <span style="font-style: italic;"># [2, 3]</span>
 
-y = x.transpose(0, 1)  \# Swap dims 0 and 1
-\# [[1, 4],
-\#  [2, 5],
-\#  [3, 6]]  \# [3, 2]
+y = x.transpose(0, 1)  <span style="font-style: italic;"># Swap dims 0 and 1</span>
+<span style="font-style: italic;"># [[1, 4],</span>
+<span style="font-style: italic;">#  [2, 5],</span>
+<span style="font-style: italic;">#  [3, 6]]  # [3, 2]</span>
 
-\# Shorthand for 2D
-y = x.T  \# Same as x.transpose(0, 1)
-```
+<span style="font-style: italic;"># Shorthand for 2D</span>
+y = x.T  <span style="font-style: italic;"># Same as x.transpose(0, 1)</span></code></pre>
 
-**Higher Dimensions (len(shape) > 2):**
-
-**Key Point:** `.transpose()` **only swaps TWO specific dimensions**, leaving all others unchanged.
+<strong>Higher Dimensions (len(shape) > 2):</strong>
+<strong>Key Point:</strong> <code>.transpose()</code> <strong>only swaps TWO specific dimensions</strong>, leaving all others unchanged.
 
 python
+<pre><code><span style="font-style: italic;"># 3D tensor</span>
+x = torch.arange(24).view(2, 3, 4)  <span style="font-style: italic;"># [2, 3, 4]</span>
+print(x.shape)  <span style="font-style: italic;"># torch.Size([2, 3, 4])</span>
 
-```
-\# 3D tensor
-x = torch.arange(24).view(2, 3, 4)  \# [2, 3, 4]
-print(x.shape)  \# torch.Size([2, 3, 4])
+<span style="font-style: italic;"># Swap dimensions 0 and 1</span>
+y = x.transpose(0, 1)  <span style="font-style: italic;"># [3, 2, 4]</span>
+<span style="font-style: italic;"># Dimension 0 (size 2) ↔ Dimension 1 (size 3)</span>
+<span style="font-style: italic;"># Dimension 2 (size 4) unchanged</span>
 
-\# Swap dimensions 0 and 1
-y = x.transpose(0, 1)  \# [3, 2, 4]
-\# Dimension 0 (size 2) ↔ Dimension 1 (size 3)
-\# Dimension 2 (size 4) unchanged
+<span style="font-style: italic;"># Swap dimensions 1 and 2  </span>
+z = x.transpose(1, 2)  <span style="font-style: italic;"># [2, 4, 3]</span>
+<span style="font-style: italic;"># Dimension 0 (size 2) unchanged</span>
+<span style="font-style: italic;"># Dimension 1 (size 3) ↔ Dimension 2 (size 4)</span>
 
-\# Swap dimensions 1 and 2  
-z = x.transpose(1, 2)  \# [2, 4, 3]
-\# Dimension 0 (size 2) unchanged
-\# Dimension 1 (size 3) ↔ Dimension 2 (size 4)
+<span style="font-style: italic;"># Swap dimensions 0 and 2</span>
+w = x.transpose(0, 2)  <span style="font-style: italic;"># [4, 3, 2]</span>
+<span style="font-style: italic;"># Dimension 0 (size 2) ↔ Dimension 2 (size 4)</span>
+<span style="font-style: italic;"># Dimension 1 (size 3) unchanged</span></code></pre>
 
-\# Swap dimensions 0 and 2
-w = x.transpose(0, 2)  \# [4, 3, 2]
-\# Dimension 0 (size 2) ↔ Dimension 2 (size 4)
-\# Dimension 1 (size 3) unchanged
-```
-
-**Concrete Example with Values:**
+<strong>Concrete Example with Values:</strong>
 
 python
+<pre><code>x = torch.arange(24).view(2, 3, 4)  <span style="font-style: italic;"># [2, 3, 4]</span>
+<span style="font-style: italic;"># [[[ 0,  1,  2,  3],</span>
+<span style="font-style: italic;">#   [ 4,  5,  6,  7],</span>
+<span style="font-style: italic;">#   [ 8,  9, 10, 11]],</span>
+<span style="font-style: italic;">#</span>
+<span style="font-style: italic;">#  [[12, 13, 14, 15],</span>
+<span style="font-style: italic;">#   [16, 17, 18, 19],</span>
+<span style="font-style: italic;">#   [20, 21, 22, 23]]]</span>
 
-```
-x = torch.arange(24).view(2, 3, 4)  \# [2, 3, 4]
-\# [[[ 0,  1,  2,  3],
-\#   [ 4,  5,  6,  7],
-\#   [ 8,  9, 10, 11]],
-\#
-\#  [[12, 13, 14, 15],
-\#   [16, 17, 18, 19],
-\#   [20, 21, 22, 23]]]
+<span style="font-style: italic;"># Transpose dims 1 and 2 (last two dimensions)</span>
+y = x.transpose(1, 2)  <span style="font-style: italic;"># [2, 4, 3]</span>
+<span style="font-style: italic;"># [[[ 0,  4,  8],      ← Elements from column 0 of each row</span>
+<span style="font-style: italic;">#   [ 1,  5,  9],      ← Elements from column 1</span>
+<span style="font-style: italic;">#   [ 2,  6, 10],      ← Elements from column 2</span>
+<span style="font-style: italic;">#   [ 3,  7, 11]],     ← Elements from column 3</span>
+<span style="font-style: italic;">#</span>
+<span style="font-style: italic;">#  [[12, 16, 20],</span>
+<span style="font-style: italic;">#   [13, 17, 21],</span>
+<span style="font-style: italic;">#   [14, 18, 22],</span>
+<span style="font-style: italic;">#   [15, 19, 23]]]</span>
 
-\# Transpose dims 1 and 2 (last two dimensions)
-y = x.transpose(1, 2)  \# [2, 4, 3]
-\# [[[ 0,  4,  8],      ← Elements from column 0 of each row
-\#   [ 1,  5,  9],      ← Elements from column 1
-\#   [ 2,  6, 10],      ← Elements from column 2
-\#   [ 3,  7, 11]],     ← Elements from column 3
-\#
-\#  [[12, 16, 20],
-\#   [13, 17, 21],
-\#   [14, 18, 22],
-\#   [15, 19, 23]]]
+<span style="font-style: italic;"># Original: x[0, 1, 2] = 6</span>
+<span style="font-style: italic;"># After transpose: y[0, 2, 1] = 6</span></code></pre>
 
-\# Original: x[0, 1, 2] = 6
-\# After transpose: y[0, 2, 1] = 6
-```
-
-**Negative Indexing:**
+<strong>Negative Indexing:</strong>
 
 python
+<pre><code>x = torch.randn(2, 3, 4, 5)  <span style="font-style: italic;"># [2, 3, 4, 5]</span>
 
-```
-x = torch.randn(2, 3, 4, 5)  \# [2, 3, 4, 5]
+<span style="font-style: italic;"># These are equivalent:</span>
+y = x.transpose(2, 3)      <span style="font-style: italic;"># Swap dims 2 and 3</span>
+y = x.transpose(-2, -1)    <span style="font-style: italic;"># Swap last two dims (common pattern!)</span>
 
-\# These are equivalent:
-y = x.transpose(2, 3)      \# Swap dims 2 and 3
-y = x.transpose(-2, -1)    \# Swap last two dims (common pattern!)
+<span style="font-style: italic;"># Result: [2, 3, 5, 4]</span></code></pre>
 
-\# Result: [2, 3, 5, 4]
-```
-
-**Practical Use Cases:**
-
-**1. Attention Score Computation:**
+<strong>Practical Use Cases:</strong>
+<strong>1. Attention Score Computation:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># Q: [batch, seq, d_model] → [32, 100, 512]</span>
+<span style="font-style: italic;"># K: [batch, seq, d_model] → [32, 100, 512]</span>
 
-```
-\# Q: [batch, seq, d_model] --> [32, 100, 512]
-\# K: [batch, seq, d_model] --> [32, 100, 512]
+<span style="font-style: italic;"># Need K^T for Q @ K^T</span>
+K_T = K.transpose(-2, -1)  <span style="font-style: italic;"># [32, 512, 100]</span>
+<span style="font-style: italic;"># Swaps last two dimensions (seq and d_model)</span>
 
-\# Need K^T for Q @ K^T
-K_T = K.transpose(-2, -1)  \# [32, 512, 100]
-\# Swaps last two dimensions (seq and d_model)
+scores = Q @ K_T  <span style="font-style: italic;"># [32, 100, 100]</span></code></pre>
 
-scores = Q @ K_T  \# [32, 100, 100]
-```
-
-**2. Multi-Head Attention Reshaping:**
+<strong>2. Multi-Head Attention Reshaping:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># After splitting heads: [batch, seq, heads, head_dim]</span>
+x = torch.randn(32, 100, 8, 64)  <span style="font-style: italic;"># [32, 100, 8, 64]</span>
 
-```
-\# After splitting heads: [batch, seq, heads, head_dim]
-x = torch.randn(32, 100, 8, 64)  \# [32, 100, 8, 64]
+<span style="font-style: italic;"># Transpose to group by head: [batch, heads, seq, head_dim]</span>
+x = x.transpose(1, 2)  <span style="font-style: italic;"># [32, 8, 100, 64]</span>
+<span style="font-style: italic;"># Now dimension 1 (heads) and dimension 2 (seq) are swapped</span>
+<span style="font-style: italic;"># Can now do batched matmul across heads!</span></code></pre>
 
-\# Transpose to group by head: [batch, heads, seq, head_dim]
-x = x.transpose(1, 2)  \# [32, 8, 100, 64]
-\# Now dimension 1 (heads) and dimension 2 (seq) are swapped
-\# Can now do batched matmul across heads!
-```
-
-**3. Image Processing (Channel Permutation):**
+<strong>3. Image Processing (Channel Permutation):</strong>
 
 python
+<pre><code><span style="font-style: italic;"># PyTorch format: [batch, channels, height, width]</span>
+x = torch.randn(32, 3, 224, 224)  <span style="font-style: italic;"># [32, 3, 224, 224]</span>
 
-```
-\# PyTorch format: [batch, channels, height, width]
-x = torch.randn(32, 3, 224, 224)  \# [32, 3, 224, 224]
+<span style="font-style: italic;"># Convert to channels-last for some operations</span>
+x = x.transpose(1, 3)  <span style="font-style: italic;"># [32, 224, 224, 3]</span>
+<span style="font-style: italic;"># Only dims 1 and 3 swapped, dims 0 and 2 unchanged</span></code></pre>
 
-\# Convert to channels-last for some operations
-x = x.transpose(1, 3)  \# [32, 224, 224, 3]
-\# Only dims 1 and 3 swapped, dims 0 and 2 unchanged
-```
-
-**Multiple Transposes:**
+<strong>Multiple Transposes:</strong>
 
 python
+<pre><code>x = torch.randn(2, 3, 4, 5)  <span style="font-style: italic;"># [2, 3, 4, 5]</span>
 
-```
-x = torch.randn(2, 3, 4, 5)  \# [2, 3, 4, 5]
+<span style="font-style: italic;"># Chain multiple transposes</span>
+y = x.transpose(0, 1).transpose(2, 3)  <span style="font-style: italic;"># [3, 2, 5, 4]</span>
+<span style="font-style: italic;"># First: swap dims 0,1 → [3, 2, 4, 5]</span>
+<span style="font-style: italic;"># Then: swap dims 2,3 → [3, 2, 5, 4]</span></code></pre>
 
-\# Chain multiple transposes
-y = x.transpose(0, 1).transpose(2, 3)  \# [3, 2, 5, 4]
-\# First: swap dims 0,1 --> [3, 2, 4, 5]
-\# Then: swap dims 2,3 --> [3, 2, 5, 4]
-```
-
-**Contiguity Issue:**
+<strong>Contiguity Issue:</strong>
 
 python
+<pre><code>x = torch.randn(2, 3, 4)
+y = x.transpose(0, 1)  <span style="font-style: italic;"># Non-contiguous!</span>
 
-```
-x = torch.randn(2, 3, 4)
-y = x.transpose(0, 1)  \# Non-contiguous!
+<span style="font-style: italic;"># This fails:</span>
+z = y.view(6, 4)  <span style="font-style: italic;"># ✗ Error: tensor not contiguous</span>
 
-\# This fails:
-z = y.view(6, 4)  \# ✗ Error: tensor not contiguous
+<span style="font-style: italic;"># Solutions:</span>
+z = y.contiguous().view(6, 4)  <span style="font-style: italic;"># ✓ Make contiguous first</span>
+z = y.reshape(6, 4)             <span style="font-style: italic;"># ✓ reshape handles it automatically</span></code></pre>
 
-\# Solutions:
-z = y.contiguous().view(6, 4)  \# ✓ Make contiguous first
-z = y.reshape(6, 4)             \# ✓ reshape handles it automatically
-```
-
-**Why Non-Contiguous?**
+<strong>Why Non-Contiguous?</strong>
 
 python
+<pre><code><span style="font-style: italic;"># Original memory layout (row-major)</span>
+x = torch.tensor([[1, 2], [3, 4], [5, 6]])  <span style="font-style: italic;"># [3, 2]</span>
+<span style="font-style: italic;"># Memory: [1, 2, 3, 4, 5, 6]</span>
 
-```
-\# Original memory layout (row-major)
-x = torch.tensor([[1, 2], [3, 4], [5, 6]])  \# [3, 2]
-\# Memory: [1, 2, 3, 4, 5, 6]
+<span style="font-style: italic;"># After transpose</span>
+y = x.transpose(0, 1)  <span style="font-style: italic;"># [2, 3]</span>
+<span style="font-style: italic;"># [[1, 3, 5],</span>
+<span style="font-style: italic;">#  [2, 4, 6]]</span>
+<span style="font-style: italic;"># Would need memory: [1, 3, 5, 2, 4, 6]</span>
+<span style="font-style: italic;"># But still points to: [1, 2, 3, 4, 5, 6]</span>
+<span style="font-style: italic;"># Non-contiguous! Uses strides to reinterpret.</span></code></pre>
 
-\# After transpose
-y = x.transpose(0, 1)  \# [2, 3]
-\# [[1, 3, 5],
-\#  [2, 4, 6]]
-\# Would need memory: [1, 3, 5, 2, 4, 6]
-\# But still points to: [1, 2, 3, 4, 5, 6]
-\# Non-contiguous! Uses strides to reinterpret.
-```
-
-**Transpose vs Permute:**
+<strong>Transpose vs Permute:</strong>
 
 python
+<pre><code>x = torch.randn(2, 3, 4, 5)
 
-```
-x = torch.randn(2, 3, 4, 5)
+<span style="font-style: italic;"># .transpose() - swaps TWO dimensions only</span>
+y = x.transpose(1, 2)  <span style="font-style: italic;"># [2, 4, 3, 5]</span>
 
-\# .transpose() - swaps TWO dimensions only
-y = x.transpose(1, 2)  \# [2, 4, 3, 5]
+<span style="font-style: italic;"># .permute() - arbitrary reordering of ALL dimensions</span>
+y = x.permute(0, 2, 1, 3)  <span style="font-style: italic;"># [2, 4, 3, 5] - same result</span>
+y = x.permute(3, 1, 0, 2)  <span style="font-style: italic;"># [5, 3, 2, 4] - more flexible!</span>
 
-\# .permute() - arbitrary reordering of ALL dimensions
-y = x.permute(0, 2, 1, 3)  \# [2, 4, 3, 5] - same result
-y = x.permute(3, 1, 0, 2)  \# [5, 3, 2, 4] - more flexible!
+<span style="font-style: italic;"># For swapping 2 dims, transpose is simpler</span>
+<span style="font-style: italic;"># For complex reordering, permute is clearer</span></code></pre>
 
-\# For swapping 2 dims, transpose is simpler
-\# For complex reordering, permute is clearer
-```
-
-**Common Patterns:**
+<strong>Common Patterns:</strong>
 
 python
+<pre><code><span style="font-style: italic;"># 1. Transpose last two dimensions (very common!)</span>
+x.transpose(-2, -1)  <span style="font-style: italic;"># or x.transpose(-1, -2) - same thing</span>
 
-```
-\# 1. Transpose last two dimensions (very common!)
-x.transpose(-2, -1)  \# or x.transpose(-1, -2) - same thing
+<span style="font-style: italic;"># 2. Batch-first to sequence-first (RNNs)</span>
+x = torch.randn(32, 100, 512)  <span style="font-style: italic;"># [batch, seq, features]</span>
+x = x.transpose(0, 1)          <span style="font-style: italic;"># [seq, batch, features]</span>
 
-\# 2. Batch-first to sequence-first (RNNs)
-x = torch.randn(32, 100, 512)  \# [batch, seq, features]
-x = x.transpose(0, 1)          \# [seq, batch, features]
+<span style="font-style: italic;"># 3. Channel repositioning</span>
+x = torch.randn(32, 3, 224, 224)  <span style="font-style: italic;"># [B, C, H, W]</span>
+x = x.transpose(1, 2)             <span style="font-style: italic;"># [B, H, C, W]</span></code></pre>
 
-\# 3. Channel repositioning
-x = torch.randn(32, 3, 224, 224)  \# [B, C, H, W]
-x = x.transpose(1, 2)             \# [B, H, C, W]
-```
-
-**4D Example (Common in CNNs/Attention):**
+<strong>4D Example (Common in CNNs/Attention):</strong>
 
 python
+<pre><code><span style="font-style: italic;"># 4D tensor: [batch, heads, seq, head_dim]</span>
+x = torch.randn(8, 12, 100, 64)  <span style="font-style: italic;"># [8, 12, 100, 64]</span>
 
-```
-\# 4D tensor: [batch, heads, seq, head_dim]
-x = torch.randn(8, 12, 100, 64)  \# [8, 12, 100, 64]
+<span style="font-style: italic;"># Transpose to move heads after seq</span>
+y = x.transpose(1, 2)  <span style="font-style: italic;"># [8, 100, 12, 64]</span>
+<span style="font-style: italic;"># Dimensions: 0→0, 1→2, 2→1, 3→3</span>
 
-\# Transpose to move heads after seq
-y = x.transpose(1, 2)  \# [8, 100, 12, 64]
-\# Dimensions: 0-->0, 1-->2, 2-->1, 3-->3
+<span style="font-style: italic;"># Transpose last two (for K^T in attention)</span>
+z = x.transpose(-2, -1)  <span style="font-style: italic;"># [8, 12, 64, 100]</span>
+<span style="font-style: italic;"># Dimensions: 0→0, 1→1, 2→3, 3→2</span></code></pre>
 
-\# Transpose last two (for K^T in attention)
-z = x.transpose(-2, -1)  \# [8, 12, 64, 100]
-\# Dimensions: 0-->0, 1-->1, 2-->3, 3-->2
-```
-
-**Memory and Performance:**
+<strong>Memory and Performance:</strong>
 
 python
-
-```
-\# transpose() is cheap - just changes metadata (strides)
+<pre><code><span style="font-style: italic;"># transpose() is cheap - just changes metadata (strides)</span>
 x = torch.randn(1000, 1000, 1000)
-y = x.transpose(0, 2)  \# Instant! No data copying
+y = x.transpose(0, 2)  <span style="font-style: italic;"># Instant! No data copying</span>
 
-\# But operations on non-contiguous tensors may be slower
-z = y + 1  \# Might be slower than if y was contiguous
+<span style="font-style: italic;"># But operations on non-contiguous tensors may be slower</span>
+z = y + 1  <span style="font-style: italic;"># Might be slower than if y was contiguous</span>
 
-\# Make contiguous if doing many operations
-y = y.contiguous()  \# Now subsequent ops faster
-```
+<span style="font-style: italic;"># Make contiguous if doing many operations</span>
+y = y.contiguous()  <span style="font-style: italic;"># Now subsequent ops faster</span></code></pre>
 
-**Key Takeaway:** `.transpose(dim0, dim1)` swaps exactly two dimensions while keeping all others in place. It returns a view (fast, no copying) but creates a non-contiguous tensor. Essential for attention mechanisms (K^T), dimension reordering in transformers, and format conversions. Use negative indices for last dimensions: `.transpose(-2, -1)` is a very common pattern.
+<strong>Key Takeaway:</strong> <code>.transpose(dim0, dim1)</code> swaps exactly two dimensions while keeping all others in place. It returns a view (fast, no copying) but creates a non-contiguous tensor. Essential for attention mechanisms (K^T), dimension reordering in transformers, and format conversions. Use negative indices for last dimensions: <code>.transpose(-2, -1)</code> is a very common pattern.

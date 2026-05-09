@@ -1,6 +1,0 @@
-{
-    "markdown.preview.breaks": true,
-    "markdown.copyFiles.destination": {
-        "**/*.md": "media/"
-    }
-}
